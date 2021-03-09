@@ -25,6 +25,9 @@ jobs:
       - name: Clone ebook2cw repo
         run: git clone https://git.fkurz.net/dj1yfk/ebook2cw.git
 
+      - name: For some reason it errors out on german translation
+        run: sed -i.bak 's/\(install .*-m 0644 po\/de.mo\)/#\1/' ebook2cw/Makefile
+
       - name: Install ebook2cw
         run: sudo make install --directory=ebook2cw/
 
