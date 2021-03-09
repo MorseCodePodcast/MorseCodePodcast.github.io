@@ -28,6 +28,9 @@ jobs:
       - name: For some reason it errors out on german translation
         run: sed -i.bak 's/\(install .*-m 0644 po\/de.mo\)/#\1/' ebook2cw/Makefile
 
+      - name: Make ebook2cw
+        run: sudo make --directory=ebook2cw/
+
       - name: Install ebook2cw
         run: sudo make install --directory=ebook2cw/
 
