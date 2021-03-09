@@ -1,0 +1,63 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main  # Set a branch to deploy
+# on:
+#   schedule:
+#     - cron: "0 0 * * *"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set Date Env
+        run: echo "TODAY=$(date +%F)" >> $GITHUB_ENV
+
+      - name: Refresh repos
+        run: sudo apt-get update
+
+      - name: Install Dependancies
+        run: sudo apt-get install --assume-yes fortune espeak internetarchive sox libsox-fmt-all libvorbis-dev libmp3-dev build-essentials
+
+      - name: Clone ebook2cw repo
+        run: git clone https://git.fkurz.net/dj1yfk/ebook2cw.git
+
+      - name: Install ebook2cw
+        run: sudo make install --directory=ebook2cw/
+
+      - name: Compose Intro
+        run: espeak "This is the morse code podcast for $(date +'%A %B %e %Y')" -w $TODAY-intro.wav
+
+      - name: Mux intro to mp3
+        run: sox $TODAY-intro.wav -r 44100 $TODAY-intro.mp3
+
+      - name: Compose CW at 25 WPM
+        run: fortune | ebook2cw -c "" -w 25 -e 25 -s 44100 -o $TODAY-message
+
+      - name: Mux CW to mp3
+        run: sox $TODAY-message.mp3 -r 44100 $TODAY-message.mp3
+
+      - name: Compose Outro
+        run: espeak "This concludes our transmission" -w $TODAY-outro.wav
+
+      - name: Mux outro to mp3
+        run: sox $TODAY-outro.wav -r 44100 $TODAY-outro.mp3
+
+      - name: Stitch it all together
+        run: sox --combine concatenate $TODAY-intro.mp3 $TODAY-message.mp3 $TODAY-outro.mp3 $TODAY.mp3
+
+      - name: Upload episode to Archive.org for hosting
+        run: |
+          curl --location --header 'x-amz-auto-make-bucket:1' \
+               --header 'x-archive-meta01-collection:Podcasts' \
+               --header 'x-archive-meta-mediatype:audio' \
+               --header 'x-archive-meta-title:Morse Code Podcast' \
+               --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
+               --upload-file $TODAY.mp3 \
+               http://s3.us.archive.org/MCP_TEST/$TODAY.mp3
+
+      # - name: Create Blog Post
+        # run:
