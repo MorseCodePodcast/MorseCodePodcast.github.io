@@ -13,7 +13,7 @@ echo "$MESSAGE" | ebook2cw -c "" -w 30 -e $PODCAST_WPM -s 44100 -o $TODAY-messag
 # Compose the outro
 espeak "This concludes our transmission" --stdout | sox - -t mp3 -r 44100 $TODAY-outro.mp3
 # Press the episode
-sox --combine concatenate $TODAY-intro.mp3 $TODAY-message-$PODCAST_WPM.mp3 $TODAY-outro.mp3 $TODAY-$PODCAST_WPM-WPM.mp3
+sox --combine concatenate $TODAY-intro.mp3 $TODAY-message-$PODCAST_WPM.mp3 $TODAY-outro.mp3 $TODAY-$PODCAST_WPM.WPM.mp3
 
 # Get message from post notes
 # tail -n 1 $TODAY-Post.md | ebook2cw  -c ""  -w 30 -e $PODCAST_WPM -s 44100 -o $TODAY-message
