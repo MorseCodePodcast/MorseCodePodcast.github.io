@@ -33,8 +33,8 @@ function post {
         file_itunes: //path/
         excerpt: 
         summary: 
-        duration: 
-        length: "$(<$TODAY.mp3 wc -c)"
+	duration: "$(soxi -d $TODAY-05.WPM.mp3)" 
+        length: "$(<$TODAY-05.WPM.mp3 wc -c)"
         explicit: "no"
         block: "no"
         ---
