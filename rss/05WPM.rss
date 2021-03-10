@@ -1,17 +1,17 @@
 ---
-layout: null
+
 ---
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xml:lang="{{ site.lang }}">
 	<channel>
-		<atom:link href="{{ site.url }}/podcast.rss" rel="self" type="application/rss+xml" />
+		<atom:link href="{{ site.url }}/rss/05WPM.rss" rel="self" type="application/rss+xml" />
 		<title>{{ site.title }}</title>
 		<description>{{ site.description | xml_escape }}</description>
 		<link>{{ site.url }}</link>
 		<language>{{ site.lang }}</language>
 		<managingEditor>{{ site.email }} ({{ site.author }})</managingEditor>
 		<webMaster>{{ site.email }} ({{ site.author }})</webMaster>
-		<copyright>2014-{{ site.time | "%Y" }} {{ site.title }}</copyright>
+		<copyright>2021-{{ site.time | date_to_rfc822 }} {{ site.title }}</copyright>
 		<pubDate>{{ site.time | date_to_rfc822 }}</pubDate>
 		<lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
 		<image>
@@ -32,10 +32,10 @@ layout: null
 		<itunes:category text="Morse Code">
 			<itunes:category text="Podcasting" />
 		</itunes:category>
-		<itunes:category text="Society &amp; Culture">
-			<itunes:category text="Philosophy" />
+		<itunes:category text="Culture">
+			<itunes:category text="Morse Code" />
 		</itunes:category>
-		<itunes:explicit>yes</itunes:explicit>
+		<itunes:explicit>no</itunes:explicit>
 		{% for post in site.posts %}
 			<item>
 				<title>{{ post.title | xml_escape }}</title>
@@ -43,6 +43,7 @@ layout: null
 				<pubDate>{{ post.date | date_to_rfc822 }}</pubDate>
 				<description>{{ post.excerpt | xml_escape }}</description>
 				<guid isPermaLink="true">{{ site.url }}{{ post.url }}</guid>
+				/* <guid isPermaLink="true">{{ site.url }}{{ post.url }}</guid> */
 				<enclosure url="{{ post.file }}" length="{{ post.length }}" type="audio/mp3"/>
 				<itunes:author>{{ site.author }}</itunes:author>
 				<itunes:subtitle>{{ site.title }}: {{ post.title }}</itunes:subtitle>
