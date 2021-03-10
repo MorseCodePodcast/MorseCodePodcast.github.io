@@ -21,7 +21,6 @@ sox --combine concatenate $TODAY-intro.mp3 $TODAY-message-$PODCAST_WPM.mp3 $TODA
 # Get message from fortune.
 # fortune -s
 
-
 function post {
     echo "
         ---
@@ -30,7 +29,7 @@ function post {
         today: "$TODAY"
         wpm: "$PODCAST_WPM"
         date: $TODAY 00:00:00 -0600
-        file: https://archive.org/download/MCP_$PODCAST_WPM-WPM/$TODAY-$PODCAST_WPM-WPM.mp3
+        # file: https://archive.org/download/MCP_$PODCAST_WPM-WPM/$TODAY-$PODCAST_WPM.WPM.mp3
         file_itunes: //path/
         excerpt: 
         summary: 
