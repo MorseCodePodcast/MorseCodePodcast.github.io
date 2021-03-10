@@ -44,7 +44,7 @@ jobs:
         run: sox $TODAY-intro.wav -r 44100 $TODAY-intro.mp3
 
       - name: Compose CW at 25 WPM
-        run: echo "$MESSAGE" | ebook2cw -c "" -w 25 -e 25 -s 44100 -o $TODAY-message
+        run: echo "$MESSAGE" | ebook2cw -c "" -w 25 -e 5 -s 44100 -o $TODAY-message
 
       # - name: Mux CW to mp3
       #   run: sox $TODAY-message.mp3 -r 44100 $TODAY-message.mp3
