@@ -29,6 +29,12 @@ github_username:  MorseCodePodcast
 
 # Build settings
 theme: minima
+
+collections:
+  rss:
+  blog:
+    output: true
+
 plugins:
   - jekyll-feed
 
