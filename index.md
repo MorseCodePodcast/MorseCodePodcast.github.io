@@ -3,7 +3,7 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: post
-collection: blog
+title: ""
 ---
 
 ## A tool to help you learn morse code.

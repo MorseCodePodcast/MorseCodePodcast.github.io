@@ -67,7 +67,7 @@ jobs:
                --header 'x-archive-meta-title:Morse Code Podcast 05WPM' \
                --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
                --upload-file $TODAY-05.WPM.mp3 \
-               http://s3.us.archive.org/MCP-05.WPM/$TODAY-$PODCAST_WPM.WPM.mp3
+               http://s3.us.archive.org/MCP-05.WPM/$TODAY-05.WPM.mp3
 
       - name: Upload 10WPM episode to Archive.org for hosting
         run: |
