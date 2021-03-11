@@ -24,10 +24,10 @@ jobs:
         run: sudo apt-get install --assume-yes fortune espeak internetarchive sox libsox-fmt-all libvorbis-dev libmp3lame-dev gettext build-essential
 
       # - name: Set message env
-      #   run: echo "MESSAGE=$(tail -n 1 _posts/$TODAY-Post.md)" >> $GITHUB_ENV
+        # run: echo "MESSAGE=$(tail -n 1 _posts/$TODAY-Post.md)" >> $GITHUB_ENV
 
       - name: Set message env
-        run: echo "MESSAGE=$(fortune -s)" >> $GITHUB_ENV
+        run: echo "MESSAGE=$(fortune -s | tr -d '\n' | tr -s '\t' ' '| tr -s '  ')" >> $GITHUB_ENV
 
       - name: Clone ebook2cw repo
         run: git clone https://git.fkurz.net/dj1yfk/ebook2cw.git
@@ -44,19 +44,19 @@ jobs:
       - name: Press 05WPM episodes
         run: ./episode_press.sh 05 "$MESSAGE"
 
-      - name: Press 05WPM episodes
+      - name: Press 10WPM episodes
         run: ./episode_press.sh 10 "$MESSAGE"
 
-      - name: Press 05WPM episodes
+      - name: Press 15WPM episodes
         run: ./episode_press.sh 15 "$MESSAGE"
 
-      - name: Press 05WPM episodes
+      - name: Press 20WPM episodes
         run: ./episode_press.sh 20 "$MESSAGE"
 
-      - name: Press 05WPM episodes
+      - name: Press 25WPM episodes
         run: ./episode_press.sh 25 "$MESSAGE"
 
-      - name: Press 05WPM episodes
+      - name: Press 30WPM episodes
         run: ./episode_press.sh 30 "$MESSAGE"
 
       - name: Upload 05WPM episode to Archive.org for hosting
