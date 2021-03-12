@@ -26,8 +26,8 @@ jobs:
       # - name: Set message env
         # run: echo "MESSAGE=$(tail -n 1 _posts/$TODAY-Post.md)" >> $GITHUB_ENV
 
-      - name: Set message env
-        run: echo "MESSAGE=$(fortune -s | tr -d '\n' | tr -s '\t' ' '| tr -s '  ')" >> $GITHUB_ENV
+      # - name: Set message env
+        # run: echo "MESSAGE=$(fortune -s | tr -d '\n' | tr -s '\t' ' '| tr -s '  ')" >> $GITHUB_ENV
 
       - name: Clone ebook2cw repo
         run: git clone https://git.fkurz.net/dj1yfk/ebook2cw.git
@@ -42,22 +42,22 @@ jobs:
         run: sudo make install --directory=ebook2cw/
 
       - name: Press 05WPM episodes
-        run: ./episode_press.sh 05 "$MESSAGE"
+        run: ./episode_press.sh 05
 
       - name: Press 10WPM episodes
-        run: ./episode_press.sh 10 "$MESSAGE"
+        run: ./episode_press.sh 10
 
       - name: Press 15WPM episodes
-        run: ./episode_press.sh 15 "$MESSAGE"
+        run: ./episode_press.sh 15
 
       - name: Press 20WPM episodes
-        run: ./episode_press.sh 20 "$MESSAGE"
+        run: ./episode_press.sh 20
 
       - name: Press 25WPM episodes
-        run: ./episode_press.sh 25 "$MESSAGE"
+        run: ./episode_press.sh 25
 
       - name: Press 30WPM episodes
-        run: ./episode_press.sh 30 "$MESSAGE"
+        run: ./episode_press.sh 30
 
       - name: Upload 05WPM episode to Archive.org for hosting
         run: |
@@ -119,5 +119,11 @@ jobs:
                --upload-file $TODAY-30.WPM.mp3 \
                http://s3.us.archive.org/MCP-30.WPM/$TODAY-30.WPM.mp3
 
-      # - name: Create Blog Post
-        # run:
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with: 
+          commit_message: Apply automated Posts
+          branch: main
+          file_pattern: _posts/*.md
+          commit_user_name: GithubActionBot
+
+

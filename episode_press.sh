@@ -1,8 +1,32 @@
 #!/bin/bash
 
 TODAY=$(date +%F)
-MESSAGE=$2
 PODCAST_WPM=$1
+
+if test -f "_posts/$TODAY-Post.md"; then
+  MESSAGE="$(ggrep -oP "^message:\s+\K.*" _posts/$TODAY-Post.md)"
+else
+  MESSAGE="$(fortune -s | tr -d '\n' | tr -s '\t' ' '| tr -s '  ')"
+  echo "\
+---
+layout: post
+title: \"$TODAY\"
+date: $TODAY 00:00:00 -0600
+file:
+file_itunes:
+excerpt:
+summary: \"$MESSAGE\"
+message: $MESSAGE
+duration: \"01:00\"
+length: \"11444\"
+explicit: \"no\"
+block: \"no\"
+---
+$MESSAGE
+" > _posts/$(date +%F)-Post.md
+fi
+
+
 
 # Compose the intro
 espeak "This is the Morse Code Podcast for $(date  +'%A %B %e %Y')" --stdout | sox - -t mp3 -r 44100 $TODAY-intro.mp3
