@@ -1,13 +1,13 @@
 name: build
 
-on:
-  push:
-    branches:
-      - main  # Set a branch to deploy
-
 # on:
-#   schedule:
-#     - cron: "0 0 * * *"
+#   push:
+#     branches:
+#       - main  # Set a branch to deploy
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
 
 jobs:
   deploy:
@@ -22,12 +22,6 @@ jobs:
 
       - name: Install Dependancies
         run: sudo apt-get install --assume-yes fortune espeak internetarchive sox libsox-fmt-all libvorbis-dev libmp3lame-dev gettext build-essential
-
-      # - name: Set message env
-        # run: echo "MESSAGE=$(tail -n 1 _posts/$TODAY-Post.md)" >> $GITHUB_ENV
-
-      # - name: Set message env
-        # run: echo "MESSAGE=$(fortune -s | tr -d '\n' | tr -s '\t' ' '| tr -s '  ')" >> $GITHUB_ENV
 
       - name: Clone ebook2cw repo
         run: git clone https://git.fkurz.net/dj1yfk/ebook2cw.git
@@ -59,65 +53,65 @@ jobs:
       - name: Press 30WPM episodes
         run: ./episode_press.sh 30
 
-      # - name: Upload 05WPM episode to Archive.org for hosting
-      #   run: |
-      #     curl --location --header 'x-amz-auto-make-bucket:1' \
-      #          --header 'x-archive-meta01-collection:opensource_audio' \
-      #          --header 'x-archive-meta-mediatype:audio' \
-      #          --header 'x-archive-meta-title:Morse Code Podcast 05WPM' \
-      #          --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
-      #          --upload-file $TODAY.05.WPM.mp3 \
-      #          http://s3.us.archive.org/mcp.05.WPM/$TODAY.05.WPM.mp3
+      - name: Upload 05WPM episode to Archive.org for hosting
+        run: |
+          curl --location --header 'x-amz-auto-make-bucket:1' \
+               --header 'x-archive-meta01-collection:opensource_audio' \
+               --header 'x-archive-meta-mediatype:audio' \
+               --header 'x-archive-meta-title:Morse Code Podcast 05WPM' \
+               --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
+               --upload-file $TODAY.05.WPM.mp3 \
+               http://s3.us.archive.org/mcp.05.WPM/$TODAY.05.WPM.mp3
 
-      # - name: Upload 10WPM episode to Archive.org for hosting
-      #   run: |
-      #     curl --location --header 'x-amz-auto-make-bucket:1' \
-      #          --header 'x-archive-meta01-collection:opensource_audio' \
-      #          --header 'x-archive-meta-mediatype:audio' \
-      #          --header 'x-archive-meta-title:Morse Code Podcast 10WPM' \
-      #          --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
-      #          --upload-file $TODAY.10.WPM.mp3 \
-      #          http://s3.us.archive.org/mcp.10.WPM/$TODAY.10.WPM.mp3
+      - name: Upload 10WPM episode to Archive.org for hosting
+        run: |
+          curl --location --header 'x-amz-auto-make-bucket:1' \
+               --header 'x-archive-meta01-collection:opensource_audio' \
+               --header 'x-archive-meta-mediatype:audio' \
+               --header 'x-archive-meta-title:Morse Code Podcast 10WPM' \
+               --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
+               --upload-file $TODAY.10.WPM.mp3 \
+               http://s3.us.archive.org/mcp.10.WPM/$TODAY.10.WPM.mp3
 
-      # - name: Upload 15WPM episode to Archive.org for hosting
-      #   run: |
-      #     curl --location --header 'x-amz-auto-make-bucket:1' \
-      #          --header 'x-archive-meta01-collection:opensource_audio' \
-      #          --header 'x-archive-meta-mediatype:audio' \
-      #          --header 'x-archive-meta-title:Morse Code Podcast 15WPM' \
-      #          --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
-      #          --upload-file $TODAY.15.WPM.mp3 \
-      #          http://s3.us.archive.org/mcp.15.WPM/$TODAY.15.WPM.mp3
+      - name: Upload 15WPM episode to Archive.org for hosting
+        run: |
+          curl --location --header 'x-amz-auto-make-bucket:1' \
+               --header 'x-archive-meta01-collection:opensource_audio' \
+               --header 'x-archive-meta-mediatype:audio' \
+               --header 'x-archive-meta-title:Morse Code Podcast 15WPM' \
+               --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
+               --upload-file $TODAY.15.WPM.mp3 \
+               http://s3.us.archive.org/mcp.15.WPM/$TODAY.15.WPM.mp3
 
-      # - name: Upload 20WPM episode to Archive.org for hosting
-      #   run: |
-      #     curl --location --header 'x-amz-auto-make-bucket:1' \
-      #          --header 'x-archive-meta01-collection:opensource_audio' \
-      #          --header 'x-archive-meta-mediatype:audio' \
-      #          --header 'x-archive-meta-title:Morse Code Podcast 20WPM' \
-      #          --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
-      #          --upload-file $TODAY.20.WPM.mp3 \
-      #          http://s3.us.archive.org/mcp.20.WPM/$TODAY.20.WPM.mp3
+      - name: Upload 20WPM episode to Archive.org for hosting
+        run: |
+          curl --location --header 'x-amz-auto-make-bucket:1' \
+               --header 'x-archive-meta01-collection:opensource_audio' \
+               --header 'x-archive-meta-mediatype:audio' \
+               --header 'x-archive-meta-title:Morse Code Podcast 20WPM' \
+               --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
+               --upload-file $TODAY.20.WPM.mp3 \
+               http://s3.us.archive.org/mcp.20.WPM/$TODAY.20.WPM.mp3
 
-      # - name: Upload 25WPM episode to Archive.org for hosting
-      #   run: |
-      #     curl --location --header 'x-amz-auto-make-bucket:1' \
-      #          --header 'x-archive-meta01-collection:opensource_audio' \
-      #          --header 'x-archive-meta-mediatype:audio' \
-      #          --header 'x-archive-meta-title:Morse Code Podcast 25WPM' \
-      #          --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
-      #          --upload-file $TODAY.25.WPM.mp3 \
-      #          http://s3.us.archive.org/mcp.25.WPM/$TODAY.25.WPM.mp3
+      - name: Upload 25WPM episode to Archive.org for hosting
+        run: |
+          curl --location --header 'x-amz-auto-make-bucket:1' \
+               --header 'x-archive-meta01-collection:opensource_audio' \
+               --header 'x-archive-meta-mediatype:audio' \
+               --header 'x-archive-meta-title:Morse Code Podcast 25WPM' \
+               --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
+               --upload-file $TODAY.25.WPM.mp3 \
+               http://s3.us.archive.org/mcp.25.WPM/$TODAY.25.WPM.mp3
 
-      # - name: Upload 30WPM episode to Archive.org for hosting
-      #   run: |
-      #     curl --location --header 'x-amz-auto-make-bucket:1' \
-      #          --header 'x-archive-meta01-collection:opensource_audio' \
-      #          --header 'x-archive-meta-mediatype:audio' \
-      #          --header 'x-archive-meta-title:Morse Code Podcast 30WPM' \
-      #          --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
-      #          --upload-file $TODAY.30.WPM.mp3 \
-      #          http://s3.us.archive.org/mcp.30.WPM/$TODAY.30.WPM.mp3
+      - name: Upload 30WPM episode to Archive.org for hosting
+        run: |
+          curl --location --header 'x-amz-auto-make-bucket:1' \
+               --header 'x-archive-meta01-collection:opensource_audio' \
+               --header 'x-archive-meta-mediatype:audio' \
+               --header 'x-archive-meta-title:Morse Code Podcast 30WPM' \
+               --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
+               --upload-file $TODAY.30.WPM.mp3 \
+               http://s3.us.archive.org/mcp.30.WPM/$TODAY.30.WPM.mp3
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with: 
