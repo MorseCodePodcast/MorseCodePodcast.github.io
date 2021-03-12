@@ -6,7 +6,7 @@ PODCAST_WPM=$1
 if test -f "_posts/$TODAY-Post.md"; then
   MESSAGE="$(grep -oP "^message:\s+\K.*" _posts/$TODAY-Post.md)"
 else
-  MESSAGE="$(fortune -s | tr -d '\n' | tr -s '\t' ' '| tr -s '  ')"
+	MESSAGE="$(fortune -s | tr -d '\n' | tr -s '\t' ' '| tr -s '"' ' ' | tr -s '  ')"
   echo "\
 ---
 layout: post

@@ -44,7 +44,7 @@
 				<description>{{ post.excerpt | xml_escape }}</description>
 				<guid isPermaLink="true">{{ site.url }}{{ post.url }}</guid>
 				/* <guid isPermaLink="true">{{ site.url }}{{ post.url }}</guid> */
-				<enclosure url="https://archive.org/download/mcp.10.WPM/{{ post.title }}.10.WPM.mp3" length="{{ post.length }}" type="audio/mp3"/>
+				<enclosure url="https://archive.org/download/mcp.10.WPM/{{ post.today }}.10.WPM.mp3" length="{{ post.length }}" type="audio/mp3"/>
 				<itunes:author>{{ site.author }}</itunes:author>
 				<itunes:subtitle>{{ site.title }}: {{ post.title }}</itunes:subtitle>
 				<itunes:summary>{{ post.summary | xml_escape }}</itunes:summary>
