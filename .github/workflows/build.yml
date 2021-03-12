@@ -119,10 +119,6 @@ jobs:
       #          --upload-file $TODAY.30.WPM.mp3 \
       #          http://s3.us.archive.org/mcp.30.WPM/$TODAY.30.WPM.mp3
 
-      - uses: helaili/jekyll-action@2.0.5
-        env:
-          JEKYLL_PAT: ${{ secrets.JEKYLL_PAT }}
-
       - uses: stefanzweifel/git-auto-commit-action@v4
         with: 
           commit_message: Apply automated Posts
@@ -130,4 +126,6 @@ jobs:
           file_pattern: _posts/*.md
           commit_user_name: GithubActionBot
 
-
+      - uses: helaili/jekyll-action@2.0.5
+        env:
+          JEKYLL_PAT: ${{ secrets.JEKYLL_PAT }}
