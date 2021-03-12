@@ -127,5 +127,7 @@ jobs:
           commit_user_name: GithubActionBot
 
       - uses: helaili/jekyll-action@2.0.5
+        with:
+          target_branch: 'gh-pages'
         env:
           JEKYLL_PAT: ${{ secrets.JEKYLL_PAT }}
