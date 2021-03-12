@@ -66,8 +66,8 @@ jobs:
                --header 'x-archive-meta-mediatype:audio' \
                --header 'x-archive-meta-title:Morse Code Podcast 05WPM' \
                --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
-               --upload-file $TODAY-05.WPM.mp3 \
-               http://s3.us.archive.org/MCP-05.WPM/$TODAY-05.WPM.mp3
+               --upload-file $TODAY.05.WPM.mp3 \
+               http://s3.us.archive.org/mcp.05.WPM/$TODAY.05.WPM.mp3
 
       - name: Upload 10WPM episode to Archive.org for hosting
         run: |
@@ -76,8 +76,8 @@ jobs:
                --header 'x-archive-meta-mediatype:audio' \
                --header 'x-archive-meta-title:Morse Code Podcast 10WPM' \
                --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
-               --upload-file $TODAY-10.WPM.mp3 \
-               http://s3.us.archive.org/MCP-10.WPM/$TODAY-10.WPM.mp3
+               --upload-file $TODAY.10.WPM.mp3 \
+               http://s3.us.archive.org/mcp.10.WPM/$TODAY.10.WPM.mp3
 
       - name: Upload 15WPM episode to Archive.org for hosting
         run: |
@@ -86,8 +86,8 @@ jobs:
                --header 'x-archive-meta-mediatype:audio' \
                --header 'x-archive-meta-title:Morse Code Podcast 15WPM' \
                --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
-               --upload-file $TODAY-15.WPM.mp3 \
-               http://s3.us.archive.org/MCP-15.WPM/$TODAY-15.WPM.mp3
+               --upload-file $TODAY.15.WPM.mp3 \
+               http://s3.us.archive.org/mcp.15.WPM/$TODAY.15.WPM.mp3
 
       - name: Upload 20WPM episode to Archive.org for hosting
         run: |
@@ -96,8 +96,8 @@ jobs:
                --header 'x-archive-meta-mediatype:audio' \
                --header 'x-archive-meta-title:Morse Code Podcast 20WPM' \
                --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
-               --upload-file $TODAY-20.WPM.mp3 \
-               http://s3.us.archive.org/MCP-20.WPM/$TODAY-20.WPM.mp3
+               --upload-file $TODAY.20.WPM.mp3 \
+               http://s3.us.archive.org/mcp.20.WPM/$TODAY.20.WPM.mp3
 
       - name: Upload 25WPM episode to Archive.org for hosting
         run: |
@@ -106,8 +106,8 @@ jobs:
                --header 'x-archive-meta-mediatype:audio' \
                --header 'x-archive-meta-title:Morse Code Podcast 25WPM' \
                --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
-               --upload-file $TODAY-25.WPM.mp3 \
-               http://s3.us.archive.org/MCP-25.WPM/$TODAY-25.WPM.mp3
+               --upload-file $TODAY.25.WPM.mp3 \
+               http://s3.us.archive.org/mcp.25.WPM/$TODAY.25.WPM.mp3
 
       - name: Upload 30WPM episode to Archive.org for hosting
         run: |
@@ -116,8 +116,8 @@ jobs:
                --header 'x-archive-meta-mediatype:audio' \
                --header 'x-archive-meta-title:Morse Code Podcast 30WPM' \
                --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
-               --upload-file $TODAY-30.WPM.mp3 \
-               http://s3.us.archive.org/MCP-30.WPM/$TODAY-30.WPM.mp3
+               --upload-file $TODAY.30.WPM.mp3 \
+               http://s3.us.archive.org/mcp.30.WPM/$TODAY.30.WPM.mp3
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with: 
