@@ -5,9 +5,9 @@ name: build
 on:
   schedule:
     - cron: '*/25 5 * * *'
-  # push:
-    # branches:
-      # - main  # Set a branch to deploy
+  push:
+    branches:
+      - main  # Set a branch to deploy
 
 jobs:
   deploy:
@@ -43,6 +43,7 @@ jobs:
           commit_message: Apply automated Posts
           branch: main
           file_pattern: _posts/*.md
+          commit_message: Unattended build
           commit_user_name: GithubActionBot
 
       - uses: helaili/jekyll-action@2.0.5

@@ -12,7 +12,7 @@ else
 ---
 layout: post
 title: \"$TODAY\"
-date: $TODAY 00:00:00 -0600
+date: $TODAY 00:00:00 0000
 file:
 file_itunes:
 excerpt:
