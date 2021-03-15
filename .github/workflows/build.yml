@@ -40,7 +40,6 @@ jobs:
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Apply automated Posts
           branch: main
           file_pattern: _posts/*.md
           commit_message: Unattended build
