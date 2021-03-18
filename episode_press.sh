@@ -4,6 +4,7 @@ TODAY=$(date +%F)
 PODCAST_WPM=($(printf "%s " "$@"))
 
 # If there's a preset MESSAGE for TODAY, use that one. Otherwise pick one at random.
+function make_journal {
 if test -f "_posts/$TODAY-Post.md"; then
   MESSAGE="$(grep -oP "^message:\s+\K.*" _posts/$TODAY-Post.md)"
 else
@@ -26,24 +27,29 @@ block: \"no\"
 $MESSAGE
 " > _posts/$(date +%F)-Post.md
 fi
+}
 
 # Check if files are already uploaded, for each one that does remove it from the array.
+function check_upload {
 for i in "${PODCAST_WPM[@]}"; do
-  curl --head --silent --fail https://archive.org/download/mcp."$i".WPM/"$TODAY"."$i".WPM.mp3 \
-| grep "^Location:"\
-| awk -F " " '{print $2}'\
-| xargs echo --url\
-| curl -I --fail --silent --output /dev/null --config -
+  curl --head --fail https://archive.org/download/mcp."$i".WPM/"$TODAY"."$i".WPM.mp3 \
+  | grep "^Location:"\
+  | awk -F " " '{print $2}'\
+  | xargs echo --url\
+  | curl -I --fail --silent --output /dev/null --config -
 
-if [ $? -eq 0 ]; then
-  unset PODCAST_WPM[0]
-  PODCAST_WPM=("${PODCAST_WPM[@]:0}")
-  if [ -z "$PODCAST_WPM" ]; then
-    echo "Everything already happened and I'm late to the party"; exit 0
+  if [ $? -eq 0 ]; then
+    unset PODCAST_WPM[0]
+    PODCAST_WPM=("${PODCAST_WPM[@]:0}")
+    if [ -z "$PODCAST_WPM" ]; then
+      echo "Everything already happened and I'm late to the party"; exit 0
+    fi
   fi
-fi
 done
+}
+
 # Compose the intro
+function press {
 if test -f "$TODAY-intro.mp3"; then
   true
 else
@@ -62,10 +68,13 @@ for i in "${PODCAST_WPM[@]}"; do
   echo $MESSAGE | ebook2cw -c "" -w 30 -e "$i" -s 44100 -o "$TODAY"-message-"$i"; done
 
 # Press each episode
+
 for i in "${PODCAST_WPM[@]}"; do
   sox --combine concatenate "$TODAY"-intro.mp3 "$TODAY"-message-"$i".mp3 "$TODAY"-outro.mp3 "$TODAY"."$i".WPM.mp3; done
+}
 
 # Upload each episode to Archive.org for hosting
+function upload {
 for i in "${PODCAST_WPM[@]}"; do
   curl --location --header 'x-amz-auto-make-bucket:1' \
        --header 'x-archive-meta01-collection:opensource_audio' \
@@ -75,4 +84,10 @@ for i in "${PODCAST_WPM[@]}"; do
        --upload-file "$TODAY"."$i".WPM.mp3 \
        http://s3.us.archive.org/mcp."$i".WPM/"$TODAY"."$i".WPM.mp3
 done
+}
+
+make_journal
+check_upload
+press
+upload
 exit 0
