@@ -34,6 +34,7 @@ for i in "${PODCAST_WPM[@]}"; do
 | awk -F " " '{print $2}'\
 | xargs echo --url\
 | curl -I --fail --silent --output /dev/null --config -
+
 if [ $? -eq 0 ]; then
   unset PODCAST_WPM[0]
   PODCAST_WPM=("${PODCAST_WPM[@]:0}")
@@ -73,5 +74,5 @@ for i in "${PODCAST_WPM[@]}"; do
        --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
        --upload-file "$TODAY"."$i".WPM.mp3 \
        http://s3.us.archive.org/mcp."$i".WPM/"$TODAY"."$i".WPM.mp3
-
+done
 exit 0
