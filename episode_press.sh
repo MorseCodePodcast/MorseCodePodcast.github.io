@@ -17,7 +17,7 @@ file:
 file_itunes:
 excerpt:
 summary: \"$MESSAGE\"
-message: $MESSAGE
+message: \"$MESSAGE\"
 duration: \"01:00\"
 length: \"11444\"
 explicit: \"no\"
