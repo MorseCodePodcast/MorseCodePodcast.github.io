@@ -27,14 +27,18 @@ $MESSAGE
 " > _posts/$(date +%F)-Post.md
 fi
 
-# Check if files are already uploaded, for each one that is remove it from the array.
+# Check if files are already uploaded, for each one that does remove it from the array.
 for i in "${PODCAST_WPM[@]}"; do
-  curl --head --silent --fail https://archive.org/download/mcp."$i".WPM/"$TODAY"."$i".WPM.mp3 &>/dev/null
+  curl --head --silent --fail https://archive.org/download/mcp."$i".WPM/"$TODAY"."$i".WPM.mp3 --output /dev/null \
+| grep "^Location:"\
+| awk -F " " '{print $2}'\
+| xargs echo --url\
+| curl -I --fail --silent --output /dev/null --config -
 if [ $? -eq 0 ]; then
   unset PODCAST_WPM[0]
   PODCAST_WPM=("${PODCAST_WPM[@]:0}")
-  if [ -z "$PODCAST_WPM" ]; then 
-    echo "Everything already happened and I'm late to the party"; exit 0 
+  if [ -z "$PODCAST_WPM" ]; then
+    echo "Everything already happened and I'm late to the party"; exit 0
   fi
 fi
 done
@@ -54,7 +58,7 @@ fi
 
 # Compose each message with WPM setting
 for i in "${PODCAST_WPM[@]}"; do
-	echo "$MESSAGE" | ebook2cw -c "" -w 30 -e "$i" -s 44100 -o "$TODAY"-message-"$i"; done
+  echo $MESSAGE | ebook2cw -c "" -w 30 -e "$i" -s 44100 -o "$TODAY"-message-"$i"; done
 
 # Press each episode
 for i in "${PODCAST_WPM[@]}"; do

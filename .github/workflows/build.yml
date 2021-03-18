@@ -35,7 +35,7 @@ jobs:
       - name: Install ebook2cw
         run: sudo make install --directory=ebook2cw/
 
-      - name: Press 05WPM episodes
+      - name: Press all episodes
         run: ./episode_press.sh 05 10 15 20 25 30
 
       - uses: stefanzweifel/git-auto-commit-action@v4
