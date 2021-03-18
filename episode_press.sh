@@ -13,6 +13,7 @@ else
 ---
 layout: post
 title: \"$TODAY\"
+today: \"$TODAY\"
 date: $TODAY 00:00:00 0000
 file:
 file_itunes:
@@ -65,7 +66,7 @@ fi
 
 # Compose each message with WPM setting
 for i in "${PODCAST_WPM[@]}"; do
-  echo $MESSAGE | ebook2cw -c "" -w 30 -e "$i" -s 44100 -o "$TODAY"-message-"$i"; done
+  echo "$MESSAGE" | ebook2cw -c "" -w 30 -e "$i" -s 44100 -o "$TODAY"-message-"$i"; done
 
 # Press each episode
 
