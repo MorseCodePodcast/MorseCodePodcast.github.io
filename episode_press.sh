@@ -29,7 +29,7 @@ fi
 
 # Check if files are already uploaded, for each one that does remove it from the array.
 for i in "${PODCAST_WPM[@]}"; do
-  curl --head --silent --fail https://archive.org/download/mcp."$i".WPM/"$TODAY"."$i".WPM.mp3 --output /dev/null \
+  curl --head --silent --fail https://archive.org/download/mcp."$i".WPM/"$TODAY"."$i".WPM.mp3 \
 | grep "^Location:"\
 | awk -F " " '{print $2}'\
 | xargs echo --url\
