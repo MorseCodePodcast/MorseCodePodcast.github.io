@@ -33,16 +33,14 @@ fi
 # Check if files are already uploaded, for each one that is remove it from the array.
 function check_upload {
 for i in "${PODCAST_WPM[@]}"; do
-  curl --head --url "https://archive.org/download/mcp.$i.WPM/$TODAY.$i.WPM.mp3" \
-  | grep -oP '(?<=Location:\s)[^ ]*' \
-  | xargs echo --url \
-  | curl -I --fail --silent --output /dev/null --config -
-
+  curl --head --fail --silent --output /dev/null --location-trusted "https://archive.org/download/mcp.$i.WPM/$TODAY.$i.WPM.mp3"
   if [ $? -eq 0 ]; then
     unset PODCAST_WPM[0]
     PODCAST_WPM=("${PODCAST_WPM[@]:0}")
     if [ -z "$PODCAST_WPM" ]; then
       echo "Everything already happened and I'm late to the party"; exit 0
+    else
+      echo "Uploading some episodes."
     fi
   fi
 done
@@ -80,7 +78,7 @@ for i in "${PODCAST_WPM[@]}"; do
        --header 'x-archive-meta01-collection:opensource_audio' \
        --header 'x-archive-meta-mediatype:audio' \
        --header "x-archive-meta-title:Morse Code Podcast $i.WPM" \
-       --header 'authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}' \
+       --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
        --upload-file "$TODAY.$i.WPM.mp3" \
        http://s3.us.archive.org/mcp.$i.WPM/$TODAY.$i.WPM.mp3
 done
@@ -90,4 +88,5 @@ make_journal
 check_upload
 press
 upload
+
 exit 0
