@@ -80,7 +80,7 @@ for i in "${PODCAST_WPM[@]}"; do
        --header 'x-archive-meta01-collection:opensource_audio' \
        --header 'x-archive-meta-mediatype:audio' \
        --header "x-archive-meta-title:Morse Code Podcast $i.WPM" \
-       --header 'authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}' \
+       --header "authorization: LOW ${{ secrets.S3_ACCESS }}:${{ secrets.S3_SECRET }}" \
        --upload-file "$TODAY.$i.WPM.mp3" \
        http://s3.us.archive.org/mcp.$i.WPM/$TODAY.$i.WPM.mp3
 done
