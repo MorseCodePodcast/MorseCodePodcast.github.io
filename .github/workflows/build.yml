@@ -36,6 +36,9 @@ jobs:
         run: sudo make install --directory=ebook2cw/
 
       - name: Press all episodes
+        env:
+          S3_ACCESS: ${{ secrets.S3_ACCESS }}
+          S3_SECRET: ${{ secrets.S3_SECRET }}
         run: ./episode_press.sh 05 10 15 20 25 30
 
       - uses: stefanzweifel/git-auto-commit-action@v4
