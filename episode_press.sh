@@ -4,7 +4,6 @@ TODAY=$(date +%F)
 PODCAST_WPM=($(printf "%s " "$@"))
 
 # If there's a preset MESSAGE for TODAY, use that one. Otherwise pick one at random.
-function make_journal {
 if test -f "_posts/$TODAY-Post.md"; then
   MESSAGE="$(grep -oP "^message:\s+\K.*" _posts/$TODAY-Post.md)"
 else
@@ -28,10 +27,8 @@ block: \"no\"
 $MESSAGE
 " > _posts/$(date +%F)-Post.md
 fi
-}
 
 # Check if files are already uploaded, for each one that is remove it from the array.
-function check_upload {
 for i in "${PODCAST_WPM[@]}"; do
   curl --head --fail --silent --output /dev/null --location-trusted "https://archive.org/download/mcp.$i.WPM/$TODAY.$i.WPM.mp3"
   if [ $? -eq 0 ]; then
@@ -44,10 +41,8 @@ for i in "${PODCAST_WPM[@]}"; do
     fi
   fi
 done
-}
 
 # Compose the intro
-function press {
 if test -f "$TODAY-intro.mp3"; then
   true
 else
@@ -69,10 +64,8 @@ for i in "${PODCAST_WPM[@]}"; do
 
 for i in "${PODCAST_WPM[@]}"; do
   sox --combine concatenate "$TODAY"-intro.mp3 "$TODAY"-message-"$i".mp3 "$TODAY"-outro.mp3 "$TODAY"."$i".WPM.mp3; done
-}
 
 # Upload each episode to Archive.org for hosting
-function upload {
 for i in "${PODCAST_WPM[@]}"; do
   curl --location --header 'x-amz-auto-make-bucket:1' \
        --header 'x-archive-meta01-collection:opensource_audio' \
@@ -82,11 +75,6 @@ for i in "${PODCAST_WPM[@]}"; do
        --upload-file "$TODAY.$i.WPM.mp3" \
        http://s3.us.archive.org/mcp.$i.WPM/$TODAY.$i.WPM.mp3
 done
-}
 
-make_journal
-check_upload
-press
-upload
 
 exit 0
