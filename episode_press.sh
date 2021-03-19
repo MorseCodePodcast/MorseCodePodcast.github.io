@@ -30,13 +30,13 @@ $MESSAGE
 fi
 }
 
-# Check if files are already uploaded, for each one that does remove it from the array.
+# Check if files are already uploaded, for each one that is remove it from the array.
 function check_upload {
 for i in "${PODCAST_WPM[@]}"; do
-  curl --head --fail https://archive.org/download/mcp."$i".WPM/"$TODAY"."$i".WPM.mp3 \
-  | grep "^Location:"\
-  | awk -F " " '{print $2}'\
-  | xargs echo --url\
+  curl --head --fail --url "https://archive.org/download/mcp.$i.WPM/$TODAY.$i.WPM.mp3" \
+  | grep "^Location:" \
+  | awk -F " " '{print $2}' \
+  | xargs echo --url \
   | curl -I --fail --silent --output /dev/null --config -
 
   if [ $? -eq 0 ]; then
