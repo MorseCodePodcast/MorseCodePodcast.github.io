@@ -24,7 +24,7 @@ jobs:
         run: sudo apt-get install --assume-yes fortune espeak internetarchive sox libsox-fmt-all libvorbis-dev libmp3lame-dev gettext build-essential
 
       - name: Clone ebook2cw repo
-        run: git clone https://aur.archlinux.org/ebook2cw.git
+        run: git clone https://git.fkurz.net/dj1yfk/ebook2cw.git
 
       - name: For some reason it errors out on german translation
         run: sed -i.bak 's/\(install .*-m 0644 po\/de.mo\)/#\1/' ebook2cw/Makefile
