@@ -1,2 +1,2 @@
 # MorseCodePodcast
-A podcast that releases regular episodes with the goal of helping people train their ability to recognize Morse Code.
+An automated podcast that releases daily episodes. The goal of this project is to help people train their ability to recognize Morse Code.  I mainly built this as a way to get familiar with github workflows with the added benefit of teaching myself Morse Code along the way.  This uses fortune, espeak, and ebook3cw to make the shownotes and then upload various speed episodes to archive.org
