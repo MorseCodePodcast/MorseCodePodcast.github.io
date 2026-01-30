@@ -9,6 +9,22 @@ set +e
 PODCAST_WPM=("$@")
 MAX_BACKFILL_DAYS=7
 
+# Track which items need derive tasks triggered
+ITEMS_TO_DERIVE=()
+
+# Trigger derive task to refresh an item's page on Archive.org
+trigger_derive() {
+  local item=$1
+  echo "  Triggering derive for $item..."
+  curl --silent --show-error \
+    -X POST "https://archive.org/services/tasks.php" \
+    -H "Authorization: LOW $S3_ACCESS:$S3_SECRET" \
+    -H "Content-Type: application/json" \
+    -d "{\"identifier\":\"$item\",\"cmd\":\"derive.php\",\"args\":{}}" \
+    | grep -q '"success":true' && echo "  Derive task queued for $item" \
+    || echo "  Warning: Failed to queue derive for $item"
+}
+
 # Check if episode exists on Archive.org
 check_episode_exists() {
   local date=$1
@@ -135,6 +151,10 @@ process_date() {
       --upload-file "$date.$wpm.WPM.mp3" \
       "https://s3.us.archive.org/mcp.$wpm.WPM/$date.$wpm.WPM.mp3"; then
       echo "  Uploaded $date.$wpm.WPM.mp3"
+      # Track this item for derive task (avoid duplicates)
+      if [[ ! " ${ITEMS_TO_DERIVE[*]} " =~ " mcp.$wpm.WPM " ]]; then
+        ITEMS_TO_DERIVE+=("mcp.$wpm.WPM")
+      fi
     else
       echo "  Warning: Failed to upload $date.$wpm.WPM.mp3 (will retry next run)"
     fi
@@ -176,6 +196,15 @@ main() {
   else
     echo ""
     echo "Processed $processed date(s)"
+
+    # Trigger derive tasks to refresh item pages on Archive.org
+    if [[ ${#ITEMS_TO_DERIVE[@]} -gt 0 ]]; then
+      echo ""
+      echo "Triggering item page refreshes..."
+      for item in "${ITEMS_TO_DERIVE[@]}"; do
+        trigger_derive "$item"
+      done
+    fi
   fi
 }
 
