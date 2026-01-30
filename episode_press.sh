@@ -3,7 +3,8 @@
 # Generates Morse code episodes and uploads to Archive.org
 # Supports backfill for the last 7 days if episodes were missed
 
-set -euo pipefail
+# Continue on errors - uploads may fail but we should keep trying
+set +e
 
 PODCAST_WPM=("$@")
 MAX_BACKFILL_DAYS=7
@@ -125,16 +126,18 @@ process_date() {
 
     # Upload to Archive.org
     echo "  Uploading $wpm WPM to Archive.org..."
-    curl --location --fail --silent --show-error \
+    if curl --location --silent --show-error \
       --header 'x-amz-auto-make-bucket:1' \
       --header 'x-archive-meta01-collection:opensource_audio' \
       --header 'x-archive-meta-mediatype:audio' \
       --header "x-archive-meta-title:Morse Code Podcast $wpm.WPM" \
       --header "authorization: LOW $S3_ACCESS:$S3_SECRET" \
       --upload-file "$date.$wpm.WPM.mp3" \
-      "https://s3.us.archive.org/mcp.$wpm.WPM/$date.$wpm.WPM.mp3"
-
-    echo "  Uploaded $date.$wpm.WPM.mp3"
+      "https://s3.us.archive.org/mcp.$wpm.WPM/$date.$wpm.WPM.mp3"; then
+      echo "  Uploaded $date.$wpm.WPM.mp3"
+    else
+      echo "  Warning: Failed to upload $date.$wpm.WPM.mp3 (will retry next run)"
+    fi
   done
 
   # Cleanup temp files
