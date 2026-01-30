@@ -70,9 +70,12 @@ jobs:
         run: |
           # Save the built site
           cp -r _site /tmp/site
-          # Setup for gh-pages
-          git fetch origin gh-pages:gh-pages 2>/dev/null || true
-          git checkout gh-pages 2>/dev/null || git checkout --orphan gh-pages
+          # Setup for gh-pages - try to checkout existing branch first
+          if git fetch origin gh-pages:gh-pages 2>/dev/null; then
+            git checkout gh-pages
+          else
+            git checkout --orphan gh-pages
+          fi
           # Clean directory
           git rm -rf . 2>/dev/null || true
           rm -rf * 2>/dev/null || true
