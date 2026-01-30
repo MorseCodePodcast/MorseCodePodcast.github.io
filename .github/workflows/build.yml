@@ -1,19 +1,20 @@
 name: build
 
-# on:
-
 on:
+  workflow_dispatch:
   schedule:
     - cron: '*/25 5 * * *'
   push:
     branches:
-      - main  # Set a branch to deploy
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set Date Env
         run: echo "TODAY=$(date +%F)" >> $GITHUB_ENV
 
@@ -41,15 +42,38 @@ jobs:
           S3_SECRET: ${{ secrets.S3_SECRET }}
         run: ./episode_press.sh 05 10 15 20 25 30
 
-      - uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          branch: main
-          file_pattern: _posts/*.md
-          commit_message: Unattended build
-          commit_user_name: GithubActionBot
+          ruby-version: '3.2'
+          bundler-cache: true
 
-      - uses: helaili/jekyll-action@2.0.5
-        with:
-          target_branch: 'gh-pages'
-        env:
-          JEKYLL_PAT: ${{ secrets.JEKYLL_PAT }}
+      - name: Build Jekyll site
+        run: bundle exec jekyll build
+
+      - name: Commit new posts
+        run: |
+          git config user.name "Forgejo Actions Bot"
+          git config user.email "actions@forgejo.local"
+          git add _posts/*.md
+          git diff --staged --quiet || git commit -m "Unattended build"
+
+      - name: Push main branch changes
+        run: git push origin main || true
+
+      - name: Deploy to gh-pages
+        run: |
+          # Save the built site
+          cp -r _site /tmp/site
+          # Setup for gh-pages
+          git fetch origin gh-pages:gh-pages 2>/dev/null || true
+          git checkout gh-pages 2>/dev/null || git checkout --orphan gh-pages
+          # Clean directory
+          git rm -rf . 2>/dev/null || true
+          rm -rf *
+          # Copy built site
+          cp -r /tmp/site/* .
+          # Commit and push
+          git add -A
+          git diff --staged --quiet || git commit -m "Deploy Jekyll site"
+          git push origin gh-pages
