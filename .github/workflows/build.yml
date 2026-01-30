@@ -23,20 +23,31 @@ jobs:
       - name: Refresh repos
         run: sudo apt-get update
 
-      - name: Install Dependancies
-        run: sudo apt-get install --assume-yes fortune espeak internetarchive sox libsox-fmt-all libvorbis-dev libmp3lame-dev gettext build-essential
+      - name: Install dependencies
+        run: sudo apt-get install --assume-yes fortune espeak sox libsox-fmt-all libvorbis-dev libmp3lame-dev gettext build-essential
 
-      - name: Clone ebook2cw repo
-        run: git clone https://github.com/dj1yfk/ebook2cw.git 
+      - name: Get ebook2cw latest commit hash
+        id: ebook2cw-version
+        run: |
+          HASH=$(git ls-remote https://github.com/dj1yfk/ebook2cw.git HEAD | cut -f1)
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
 
-      - name: For some reason it errors out on german translation
-        run: sed -i.bak 's/\(install .*-m 0644 po\/de.mo\)/#\1/' ebook2cw/Makefile
+      - name: Cache ebook2cw binary
+        id: cache-ebook2cw
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/ebook2cw
+          key: ebook2cw-${{ runner.os }}-${{ steps.ebook2cw-version.outputs.hash }}
 
-      - name: Make ebook2cw
-        run: sudo make --directory=ebook2cw/
-
-      - name: Install ebook2cw
-        run: sudo make install --directory=ebook2cw/
+      - name: Build ebook2cw
+        if: steps.cache-ebook2cw.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/dj1yfk/ebook2cw.git
+          # Fix german translation error
+          sed -i.bak 's/\(install .*-m 0644 po\/de.mo\)/#\1/' ebook2cw/Makefile
+          sudo make --directory=ebook2cw/
+          sudo make install --directory=ebook2cw/
+          rm -rf ebook2cw
 
       - name: Press all episodes
         env:
@@ -70,6 +81,8 @@ jobs:
         run: |
           # Save the built site
           cp -r _site /tmp/site
+          # Clean all untracked files (including ebook2cw directory)
+          git clean -fdx
           # Setup for gh-pages - try to checkout existing branch first
           if git fetch origin gh-pages:gh-pages 2>/dev/null; then
             git checkout gh-pages
