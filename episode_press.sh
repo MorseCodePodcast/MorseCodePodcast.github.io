@@ -73,7 +73,7 @@ for i in "${PODCAST_WPM[@]}"; do
        --header "x-archive-meta-title:Morse Code Podcast $i.WPM" \
        --header "authorization: LOW $S3_ACCESS:$S3_SECRET" \
        --upload-file "$TODAY.$i.WPM.mp3" \
-       http://s3.us.archive.org/mcp.$i.WPM/$TODAY.$i.WPM.mp3
+       https://s3.us.archive.org/mcp.$i.WPM/$TODAY.$i.WPM.mp3
 done
 
 

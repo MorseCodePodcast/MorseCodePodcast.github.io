@@ -11,6 +11,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -51,15 +53,18 @@ jobs:
       - name: Build Jekyll site
         run: bundle exec jekyll build
 
-      - name: Commit new posts
+      - name: Configure git
         run: |
-          git config user.name "Forgejo Actions Bot"
-          git config user.email "actions@forgejo.local"
-          git add _posts/*.md
-          git diff --staged --quiet || git commit -m "Unattended build"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Push main branch changes
-        run: git push origin main || true
+      - name: Commit and push new posts
+        run: |
+          git add _posts/*.md
+          if ! git diff --staged --quiet; then
+            git commit -m "Unattended build"
+            git push origin main
+          fi
 
       - name: Deploy to gh-pages
         run: |
@@ -70,10 +75,14 @@ jobs:
           git checkout gh-pages 2>/dev/null || git checkout --orphan gh-pages
           # Clean directory
           git rm -rf . 2>/dev/null || true
-          rm -rf *
+          rm -rf * 2>/dev/null || true
           # Copy built site
           cp -r /tmp/site/* .
+          # Add .nojekyll to skip Jekyll processing on GitHub Pages
+          touch .nojekyll
           # Commit and push
           git add -A
-          git diff --staged --quiet || git commit -m "Deploy Jekyll site"
-          git push origin gh-pages
+          if ! git diff --staged --quiet; then
+            git commit -m "Deploy Jekyll site"
+            git push origin gh-pages
+          fi
