@@ -8,9 +8,9 @@
 		<language></language>
 		<managingEditor> ()</managingEditor>
 		<webMaster> ()</webMaster>
-		<copyright>2021-Mon, 02 Feb 2026 06:07:49 +0000 Morse Code Podcast</copyright>
-		<pubDate>Mon, 02 Feb 2026 06:07:49 +0000</pubDate>
-		<lastBuildDate>Mon, 02 Feb 2026 06:07:49 +0000</lastBuildDate>
+		<copyright>2021-Tue, 03 Feb 2026 05:58:31 +0000 Morse Code Podcast</copyright>
+		<pubDate>Tue, 03 Feb 2026 05:58:31 +0000</pubDate>
+		<lastBuildDate>Tue, 03 Feb 2026 05:58:31 +0000</lastBuildDate>
 		<image>
 			<link></link>
 			<url>/images/itunes.png</url>
@@ -36,11 +36,11 @@
 		
 			<item>
 				<title></title>
-				<link>/2026/02/02/2023-07-28-Post.html</link>
-				<pubDate>Mon, 02 Feb 2026 06:07:49 +0000</pubDate>
+				<link>/2026/02/03/2023-07-28-Post.html</link>
+				<pubDate>Tue, 03 Feb 2026 05:58:31 +0000</pubDate>
 				<description></description>
-				<guid isPermaLink="true">/2026/02/02/2023-07-28-Post.html</guid>
-				/* <guid isPermaLink="true">/2026/02/02/2023-07-28-Post.html</guid> */
+				<guid isPermaLink="true">/2026/02/03/2023-07-28-Post.html</guid>
+				/* <guid isPermaLink="true">/2026/02/03/2023-07-28-Post.html</guid> */
 				<enclosure url="https://archive.org/download/mcp.05.WPM/.05.WPM.mp3" length="" type="audio/mp3"/>
 				<itunes:author></itunes:author>
 				<itunes:subtitle>Morse Code Podcast: </itunes:subtitle>
@@ -50,6 +50,25 @@
 				<itunes:image href="/images/itunes.png" />
 				<itunes:explicit></itunes:explicit>
 				<itunes:block></itunes:block>
+			</item>
+		
+			<item>
+				<title>2026-02-03</title>
+				<link>/2026/02/03/Post.html</link>
+				<pubDate>Tue, 03 Feb 2026 00:00:00 +0000</pubDate>
+				<description>&lt;p&gt;Q: What do monsters eat?A: Things.Q: What do monsters drink?A: Coke. (Because Things go better with Coke.)&lt;/p&gt;
+</description>
+				<guid isPermaLink="true">/2026/02/03/Post.html</guid>
+				/* <guid isPermaLink="true">/2026/02/03/Post.html</guid> */
+				<enclosure url="https://archive.org/download/mcp.05.WPM/2026-02-03.05.WPM.mp3" length="11444" type="audio/mp3"/>
+				<itunes:author></itunes:author>
+				<itunes:subtitle>Morse Code Podcast: 2026-02-03</itunes:subtitle>
+				<itunes:summary>Q: What do monsters eat?A: Things.Q: What do monsters drink?A: Coke. (Because Things go better with Coke.)</itunes:summary>
+				<itunes:duration>01:00</itunes:duration>
+				<itunes:keywords></itunes:keywords>
+				<itunes:image href="/images/itunes.png" />
+				<itunes:explicit>no</itunes:explicit>
+				<itunes:block>no</itunes:block>
 			</item>
 		
 			<item>
