@@ -50,9 +50,9 @@ get_message() {
   local post_file="_posts/$date-Post.md"
 
   if [[ -f "$post_file" ]]; then
-    grep -oP "^message:\s+\K.*" "$post_file" || fortune -s | tr -d '\n' | tr -s '\t' ' ' | tr -s '"' ' ' | tr -s '  '
+    grep -oP "^message:\s+\K.*" "$post_file" || fortune -s | tr -d '\n\b' | tr -cd '[:print:] ' | tr -s '\t' ' ' | tr -s '"' ' ' | tr -s '  '
   else
-    fortune -s | tr -d '\n' | tr -s '\t' ' ' | tr -s '"' ' ' | tr -s '  '
+    fortune -s | tr -d '\n\b' | tr -cd '[:print:] ' | tr -s '\t' ' ' | tr -s '"' ' ' | tr -s '  '
   fi
 }
 

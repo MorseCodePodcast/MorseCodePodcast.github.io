@@ -23,7 +23,7 @@ title: Morse Code Podcast
 description: >- # this means to ignore newlines until "baseurl:"
   An automated podcast to help with learning Morse Code.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://morsecodepodcast.github.io" # the base hostname & protocol for your site
 # twitter_username:
 github_username:  MorseCodePodcast
 
