@@ -8,9 +8,9 @@
 		<language></language>
 		<managingEditor> ()</managingEditor>
 		<webMaster> ()</webMaster>
-		<copyright>2021-Mon, 09 Feb 2026 06:10:48 +0000 Morse Code Podcast</copyright>
-		<pubDate>Mon, 09 Feb 2026 06:10:48 +0000</pubDate>
-		<lastBuildDate>Mon, 09 Feb 2026 06:10:48 +0000</lastBuildDate>
+		<copyright>2021-Tue, 10 Feb 2026 06:14:45 +0000 Morse Code Podcast</copyright>
+		<pubDate>Tue, 10 Feb 2026 06:14:45 +0000</pubDate>
+		<lastBuildDate>Tue, 10 Feb 2026 06:14:45 +0000</lastBuildDate>
 		<image>
 			<link>https://morsecodepodcast.github.io</link>
 			<url>https://morsecodepodcast.github.io/images/itunes.png</url>
@@ -33,6 +33,24 @@
 			<itunes:category text="Morse Code" />
 		</itunes:category>
 		<itunes:explicit>no</itunes:explicit>
+		
+			<item>
+				<title>2026-02-10</title>
+				<link>https://morsecodepodcast.github.io/2026/02/10/Post.html</link>
+				<pubDate>Tue, 10 Feb 2026 00:00:00 +0000</pubDate>
+				<description>&lt;p&gt;A banker is a fellow who lends you his umbrella when the sun is shiningand wants it back the minute it begins to rain.– Mark Twain&lt;/p&gt;
+</description>
+				<guid isPermaLink="true">https://morsecodepodcast.github.io/2026/02/10/Post.html</guid>
+				<enclosure url="https://archive.org/download/mcp.20.WPM/2026-02-10.20.WPM.mp3" length="11444" type="audio/mp3"/>
+				<itunes:author></itunes:author>
+				<itunes:subtitle>Morse Code Podcast: 2026-02-10</itunes:subtitle>
+				<itunes:summary>A banker is a fellow who lends you his umbrella when the sun is shiningand wants it back the minute it begins to rain.-- Mark Twain</itunes:summary>
+				<itunes:duration>01:00</itunes:duration>
+				<itunes:keywords></itunes:keywords>
+				<itunes:image href="https://morsecodepodcast.github.io/images/itunes.png" />
+				<itunes:explicit>no</itunes:explicit>
+				<itunes:block>no</itunes:block>
+			</item>
 		
 			<item>
 				<title>2026-02-09</title>
