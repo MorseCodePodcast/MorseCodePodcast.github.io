@@ -8,9 +8,9 @@
 		<language></language>
 		<managingEditor> ()</managingEditor>
 		<webMaster> ()</webMaster>
-		<copyright>2021-Fri, 27 Feb 2026 05:59:06 +0000 Morse Code Podcast</copyright>
-		<pubDate>Fri, 27 Feb 2026 05:59:06 +0000</pubDate>
-		<lastBuildDate>Fri, 27 Feb 2026 05:59:06 +0000</lastBuildDate>
+		<copyright>2021-Sat, 28 Feb 2026 05:39:59 +0000 Morse Code Podcast</copyright>
+		<pubDate>Sat, 28 Feb 2026 05:39:59 +0000</pubDate>
+		<lastBuildDate>Sat, 28 Feb 2026 05:39:59 +0000</lastBuildDate>
 		<image>
 			<link>https://morsecodepodcast.github.io</link>
 			<url>https://morsecodepodcast.github.io/images/itunes.png</url>
@@ -33,6 +33,24 @@
 			<itunes:category text="Morse Code" />
 		</itunes:category>
 		<itunes:explicit>no</itunes:explicit>
+		
+			<item>
+				<title>2026-02-28</title>
+				<link>https://morsecodepodcast.github.io/2026/02/28/Post.html</link>
+				<pubDate>Sat, 28 Feb 2026 00:00:00 +0000</pubDate>
+				<description>&lt;p&gt;After all, all he did was string together a lot of old, well-known quotations.– H. L. Mencken, on Shakespeare&lt;/p&gt;
+</description>
+				<guid isPermaLink="true">https://morsecodepodcast.github.io/2026/02/28/Post.html</guid>
+				<enclosure url="https://archive.org/download/mcp.30.WPM/2026-02-28.30.WPM.mp3" length="11444" type="audio/mp3"/>
+				<itunes:author></itunes:author>
+				<itunes:subtitle>Morse Code Podcast: 2026-02-28</itunes:subtitle>
+				<itunes:summary>After all, all he did was string together a lot of old, well-known quotations.-- H. L. Mencken, on Shakespeare</itunes:summary>
+				<itunes:duration>01:00</itunes:duration>
+				<itunes:keywords></itunes:keywords>
+				<itunes:image href="https://morsecodepodcast.github.io/images/itunes.png" />
+				<itunes:explicit>no</itunes:explicit>
+				<itunes:block>no</itunes:block>
+			</item>
 		
 			<item>
 				<title>2026-02-27</title>
