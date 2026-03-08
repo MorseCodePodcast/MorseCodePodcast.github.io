@@ -1,2 +1,10 @@
 # MorseCodePodcast
-An automated podcast that releases daily episodes. The goal of this project is to help people train their ability to recognize Morse Code.  I mainly built this as a way to get familiar with github workflows with the added benefit of teaching myself Morse Code along the way.  This uses fortune, espeak, and ebook3cw to make the shownotes and then upload various speed episodes to archive.org
+
+Automated podcast that releases daily episodes to help train Morse Code recognition. Uses fortune, espeak, and ebook3cw to generate show notes and audio at various speeds, then uploads to archive.org via GitHub Workflows.
+
+## Local Development
+
+```sh
+bundle install
+bundle exec jekyll serve
+```
