@@ -8,9 +8,9 @@
 		<language></language>
 		<managingEditor> ()</managingEditor>
 		<webMaster> ()</webMaster>
-		<copyright>2021-Mon, 23 Mar 2026 06:13:59 +0000 Morse Code Podcast</copyright>
-		<pubDate>Mon, 23 Mar 2026 06:13:59 +0000</pubDate>
-		<lastBuildDate>Mon, 23 Mar 2026 06:13:59 +0000</lastBuildDate>
+		<copyright>2021-Tue, 24 Mar 2026 06:04:47 +0000 Morse Code Podcast</copyright>
+		<pubDate>Tue, 24 Mar 2026 06:04:47 +0000</pubDate>
+		<lastBuildDate>Tue, 24 Mar 2026 06:04:47 +0000</lastBuildDate>
 		<image>
 			<link>https://morsecodepodcast.github.io</link>
 			<url>https://morsecodepodcast.github.io/images/itunes.png</url>
@@ -33,6 +33,24 @@
 			<itunes:category text="Morse Code" />
 		</itunes:category>
 		<itunes:explicit>no</itunes:explicit>
+		
+			<item>
+				<title>2026-03-24</title>
+				<link>https://morsecodepodcast.github.io/2026/03/24/Post.html</link>
+				<pubDate>Tue, 24 Mar 2026 00:00:00 +0000</pubDate>
+				<description>&lt;p&gt;Q:What’s the difference between USL and the Titanic?A:The Titanic had a band.&lt;/p&gt;
+</description>
+				<guid isPermaLink="true">https://morsecodepodcast.github.io/2026/03/24/Post.html</guid>
+				<enclosure url="https://archive.org/download/mcp.30.WPM/2026-03-24.30.WPM.mp3" length="11444" type="audio/mp3"/>
+				<itunes:author></itunes:author>
+				<itunes:subtitle>Morse Code Podcast: 2026-03-24</itunes:subtitle>
+				<itunes:summary>Q:What&apos;s the difference between USL and the Titanic?A:The Titanic had a band.</itunes:summary>
+				<itunes:duration>01:00</itunes:duration>
+				<itunes:keywords></itunes:keywords>
+				<itunes:image href="https://morsecodepodcast.github.io/images/itunes.png" />
+				<itunes:explicit>no</itunes:explicit>
+				<itunes:block>no</itunes:block>
+			</item>
 		
 			<item>
 				<title>2026-03-23</title>
