@@ -5,3 +5,6 @@ _site
 *.mp3
 vendor
 Gemfile.lock
+
+# Claude Code agent worktrees
+.claude/worktrees/
