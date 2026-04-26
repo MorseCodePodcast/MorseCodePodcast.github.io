@@ -8,9 +8,9 @@
 		<language></language>
 		<managingEditor> ()</managingEditor>
 		<webMaster> ()</webMaster>
-		<copyright>2021-Sat, 25 Apr 2026 06:22:58 +0000 Morse Code Podcast</copyright>
-		<pubDate>Sat, 25 Apr 2026 06:22:58 +0000</pubDate>
-		<lastBuildDate>Sat, 25 Apr 2026 06:22:58 +0000</lastBuildDate>
+		<copyright>2021-Sun, 26 Apr 2026 07:02:02 +0000 Morse Code Podcast</copyright>
+		<pubDate>Sun, 26 Apr 2026 07:02:02 +0000</pubDate>
+		<lastBuildDate>Sun, 26 Apr 2026 07:02:02 +0000</lastBuildDate>
 		<image>
 			<link>https://morsecodepodcast.github.io</link>
 			<url>https://morsecodepodcast.github.io/images/itunes.png</url>
@@ -33,6 +33,24 @@
 			<itunes:category text="Morse Code" />
 		</itunes:category>
 		<itunes:explicit>no</itunes:explicit>
+		
+			<item>
+				<title>2026-04-26</title>
+				<link>https://morsecodepodcast.github.io/2026/04/26/Post.html</link>
+				<pubDate>Sun, 26 Apr 2026 00:00:00 +0000</pubDate>
+				<description>&lt;p&gt;Q:Why haven’t you graduated yet?A:Well, Dad, I could have finished years ago, but I wantedmy dissertation to rhyme.&lt;/p&gt;
+</description>
+				<guid isPermaLink="true">https://morsecodepodcast.github.io/2026/04/26/Post.html</guid>
+				<enclosure url="https://archive.org/download/mcp.25.WPM/2026-04-26.25.WPM.mp3" length="11444" type="audio/mp3"/>
+				<itunes:author></itunes:author>
+				<itunes:subtitle>Morse Code Podcast: 2026-04-26</itunes:subtitle>
+				<itunes:summary>Q:Why haven&apos;t you graduated yet?A:Well, Dad, I could have finished years ago, but I wantedmy dissertation to rhyme.</itunes:summary>
+				<itunes:duration>01:00</itunes:duration>
+				<itunes:keywords></itunes:keywords>
+				<itunes:image href="https://morsecodepodcast.github.io/images/itunes.png" />
+				<itunes:explicit>no</itunes:explicit>
+				<itunes:block>no</itunes:block>
+			</item>
 		
 			<item>
 				<title>2026-04-25</title>
