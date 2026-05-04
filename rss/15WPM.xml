@@ -8,9 +8,9 @@
 		<language></language>
 		<managingEditor> ()</managingEditor>
 		<webMaster> ()</webMaster>
-		<copyright>2021-Sun, 03 May 2026 07:22:31 +0000 Morse Code Podcast</copyright>
-		<pubDate>Sun, 03 May 2026 07:22:31 +0000</pubDate>
-		<lastBuildDate>Sun, 03 May 2026 07:22:31 +0000</lastBuildDate>
+		<copyright>2021-Mon, 04 May 2026 07:51:05 +0000 Morse Code Podcast</copyright>
+		<pubDate>Mon, 04 May 2026 07:51:05 +0000</pubDate>
+		<lastBuildDate>Mon, 04 May 2026 07:51:05 +0000</lastBuildDate>
 		<image>
 			<link>https://morsecodepodcast.github.io</link>
 			<url>https://morsecodepodcast.github.io/images/itunes.png</url>
@@ -33,6 +33,24 @@
 			<itunes:category text="Morse Code" />
 		</itunes:category>
 		<itunes:explicit>no</itunes:explicit>
+		
+			<item>
+				<title>2026-05-04</title>
+				<link>https://morsecodepodcast.github.io/2026/05/04/Post.html</link>
+				<pubDate>Mon, 04 May 2026 00:00:00 +0000</pubDate>
+				<description>&lt;p&gt;Your object is to save the world, while still leading a pleasant life.&lt;/p&gt;
+</description>
+				<guid isPermaLink="true">https://morsecodepodcast.github.io/2026/05/04/Post.html</guid>
+				<enclosure url="https://archive.org/download/mcp.15.WPM/2026-05-04.15.WPM.mp3" length="11444" type="audio/mp3"/>
+				<itunes:author></itunes:author>
+				<itunes:subtitle>Morse Code Podcast: 2026-05-04</itunes:subtitle>
+				<itunes:summary>Your object is to save the world, while still leading a pleasant life.</itunes:summary>
+				<itunes:duration>01:00</itunes:duration>
+				<itunes:keywords></itunes:keywords>
+				<itunes:image href="https://morsecodepodcast.github.io/images/itunes.png" />
+				<itunes:explicit>no</itunes:explicit>
+				<itunes:block>no</itunes:block>
+			</item>
 		
 			<item>
 				<title>2026-05-03</title>
