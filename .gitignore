@@ -8,3 +8,8 @@ Gemfile.lock
 
 # Claude Code agent worktrees
 .claude/worktrees/
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
