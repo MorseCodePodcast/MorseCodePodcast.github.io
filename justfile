@@ -63,8 +63,8 @@ commit +message:
     [ "$SKIP_VERIFY" = 1 ] || just verify
     if command -v jj &>/dev/null && [ -d ".jj" ]; then
         jj describe -m "$MESSAGE"
-        BOOKMARK=$(jj log -r '@ | @-' --no-graph -T 'bookmarks ++ "\n"' 2>/dev/null \
-            | tr ' ' '\n' | grep -v '@' | grep -v '^$' | sed 's/[*?]\+$//' | head -1)
+        BOOKMARK=$(jj log -r '@ | @-' --no-graph \
+            -T 'local_bookmarks.map(|b| b.name() ++ "\n").join("")' | head -1)
         if [ -z "$BOOKMARK" ]; then
             for n in trunk main master; do
                 if jj bookmark list "$n" 2>/dev/null | grep -q "^$n:"; then
@@ -74,6 +74,16 @@ commit +message:
         fi
         [ -n "$BOOKMARK" ] || { echo "error: no main/trunk/master bookmark found" >&2; exit 1; }
         jj bookmark set "$BOOKMARK" -r @
+        # Detach @ from the bookmark BEFORE pushing: start the fresh empty child now
+        # so the bookmark points at the described commit and nothing can move it
+        # during the push loop. jj auto-snapshots the working copy before each
+        # `jj git push`; if @ were still the bookmark, an async write to a tracked
+        # file (e.g. the-desk rendering todo.md) landing between two remotes' pushes
+        # would amend @ and shove the bookmark sideways — splitting the push across
+        # two hashes. Guarded so an already-empty @ isn't re-stacked.
+        WC_STATE=$(jj log -r @ --no-graph \
+            -T 'if(empty, "empty", "dirty") ++ "-" ++ if(description, "desc", "nodesc")')
+        [ "$WC_STATE" = "empty-nodesc" ] || jj new
         REMOTES=$(jj git remote list | awk '{print $1}')
         [ -n "$REMOTES" ] || { echo "warn: no remotes configured, skipping push" >&2; exit 0; }
         for remote in $REMOTES; do
@@ -81,7 +91,6 @@ commit +message:
             jj git push --remote "$remote" --bookmark "$BOOKMARK" --allow-new \
                 || echo "warn: push to $remote failed"
         done
-        jj new
     else
         echo "warn: jj not found; falling back to git" >&2
         git add -A
