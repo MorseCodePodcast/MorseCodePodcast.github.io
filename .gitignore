@@ -13,3 +13,4 @@ Gemfile.lock
 .dolt/
 *.db
 .beads-credential-key
+.beads/proxieddb/

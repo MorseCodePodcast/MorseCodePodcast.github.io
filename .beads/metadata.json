@@ -2,6 +2,6 @@
   "database": "dolt",
   "backend": "dolt",
   "dolt_mode": "embedded",
-  "dolt_database": "repo",
-  "project_id": "1fa02793-405b-490b-8b9c-159abf8bb968"
+  "dolt_database": "MorseCodePodcast_github_io",
+  "project_id": "d193855b-df88-490f-9ea3-9fce67d66b38"
 }
