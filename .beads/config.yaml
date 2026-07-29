@@ -62,3 +62,5 @@
 # - github.repo
 
 sync.remote: "git+https://forgejo.chimera-micro.ts.net/rain/MorseCodePodcast.git"
+export:
+    auto: true
