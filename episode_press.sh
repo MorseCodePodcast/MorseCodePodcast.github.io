@@ -3,14 +3,15 @@
 # Generates Morse code episodes and uploads to Archive.org
 # Supports backfill for the last 7 days if episodes were missed
 
-# Continue on errors - uploads may fail but we should keep trying
-set +e
+set -euo pipefail
 
 PODCAST_WPM=("$@")
 MAX_BACKFILL_DAYS=7
 
 # Track which items need derive tasks triggered
 ITEMS_TO_DERIVE=()
+# Track failed uploads for reporting
+FAILED_UPLOADS=()
 
 # Trigger derive task to refresh an item's page on Archive.org
 trigger_derive() {
@@ -44,13 +45,60 @@ all_episodes_exist() {
   return 0
 }
 
+# Upload with retry and exponential backoff
+upload_with_retry() {
+  local file=$1
+  local url=$2
+  local wpm=$3
+  local max_attempts=3
+  local attempt=1
+  local delay=5
+
+  while (( attempt <= max_attempts )); do
+    if curl --fail --location --silent --show-error \
+      --header 'x-amz-auto-make-bucket:1' \
+      --header 'x-archive-meta01-collection:opensource_audio' \
+      --header 'x-archive-meta-mediatype:audio' \
+      --header "x-archive-meta-title:Morse Code Podcast ${wpm}.WPM" \
+      --header "authorization: LOW $S3_ACCESS:$S3_SECRET" \
+      --upload-file "$file" \
+      "$url"; then
+      return 0
+    fi
+    echo "  Upload attempt $attempt/$max_attempts failed, retrying in ${delay}s..."
+    sleep "$delay"
+    delay=$((delay * 3))
+    ((attempt++))
+  done
+  return 1
+}
+
+# Verify upload exists on Archive.org (with propagation delay)
+verify_upload() {
+  local url=$1
+  local max_attempts=3
+  local attempt=1
+  local delay=20
+
+  while (( attempt <= max_attempts )); do
+    sleep "$delay"
+    if curl --head --fail --silent --output /dev/null --location-trusted "$url"; then
+      return 0
+    fi
+    echo "  Verification attempt $attempt/$max_attempts failed, retrying in ${delay}s..."
+    delay=$((delay * 2))
+    ((attempt++))
+  done
+  return 1
+}
+
 # Get or create message for a date
 get_message() {
   local date=$1
   local post_file="_posts/$date-Post.md"
 
   if [[ -f "$post_file" ]]; then
-    grep -oP "^message:\s+\K.*" "$post_file" || fortune -s | tr -d '\n\b' | tr -cd '[:print:] ' | tr -s '\t' ' ' | tr -s '"' ' ' | tr -s '  '
+    grep -oP "^message:\s+\K.*" "$post_file" | tr -d '"' || fortune -s | tr -d '\n\b' | tr -cd '[:print:] ' | tr -s '\t' ' ' | tr -s '"' ' ' | tr -s '  '
   else
     fortune -s | tr -d '\n\b' | tr -cd '[:print:] ' | tr -s '\t' ' ' | tr -s '"' ' ' | tr -s '  '
   fi
@@ -109,10 +157,9 @@ process_date() {
 
   echo "Processing ${#wpms_to_process[@]} missing WPM variants for $date"
 
-  # Get or create the message
+  # Get the message (from existing post or generate new one)
   local message
   message=$(get_message "$date")
-  create_post "$date" "$message"
 
   # Get human-readable date for intro
   local readable_date
@@ -130,7 +177,9 @@ process_date() {
       sox - -t mp3 -r 44100 "$date"-outro.mp3
   fi
 
-  # Process each missing WPM variant
+  # Upload each missing WPM variant, track success
+  local all_uploaded=true
+
   for wpm in "${wpms_to_process[@]}"; do
     echo "  Generating $wpm WPM for $date..."
 
@@ -140,25 +189,37 @@ process_date() {
     # Combine intro + message + outro
     sox --combine concatenate "$date"-intro.mp3 "$date"-message-"$wpm".mp3 "$date"-outro.mp3 "$date"."$wpm".WPM.mp3
 
-    # Upload to Archive.org
+    # Upload to Archive.org with retry
     echo "  Uploading $wpm WPM to Archive.org..."
-    if curl --location --silent --show-error \
-      --header 'x-amz-auto-make-bucket:1' \
-      --header 'x-archive-meta01-collection:opensource_audio' \
-      --header 'x-archive-meta-mediatype:audio' \
-      --header "x-archive-meta-title:Morse Code Podcast $wpm.WPM" \
-      --header "authorization: LOW $S3_ACCESS:$S3_SECRET" \
-      --upload-file "$date.$wpm.WPM.mp3" \
-      "https://s3.us.archive.org/mcp.$wpm.WPM/$date.$wpm.WPM.mp3"; then
-      echo "  Uploaded $date.$wpm.WPM.mp3"
-      # Track this item for derive task (avoid duplicates)
-      if [[ ! " ${ITEMS_TO_DERIVE[*]} " =~ " mcp.$wpm.WPM " ]]; then
-        ITEMS_TO_DERIVE+=("mcp.$wpm.WPM")
+    local upload_url="https://s3.us.archive.org/mcp.$wpm.WPM/$date.$wpm.WPM.mp3"
+    local verify_url="https://archive.org/download/mcp.$wpm.WPM/$date.$wpm.WPM.mp3"
+
+    if upload_with_retry "$date.$wpm.WPM.mp3" "$upload_url" "$wpm"; then
+      echo "  Upload succeeded, verifying..."
+      if verify_upload "$verify_url"; then
+        echo "  Verified: $date.$wpm.WPM.mp3"
+        # Track this item for derive task (avoid duplicates)
+        if [[ ! " ${ITEMS_TO_DERIVE[*]:-} " =~ " mcp.$wpm.WPM " ]]; then
+          ITEMS_TO_DERIVE+=("mcp.$wpm.WPM")
+        fi
+      else
+        echo "  WARNING: $date.$wpm.WPM.mp3 uploaded but verification failed"
+        FAILED_UPLOADS+=("$date.$wpm.WPM.mp3")
+        all_uploaded=false
       fi
     else
-      echo "  Warning: Failed to upload $date.$wpm.WPM.mp3 (will retry next run)"
+      echo "  FAILED: $date.$wpm.WPM.mp3 upload failed after retries"
+      FAILED_UPLOADS+=("$date.$wpm.WPM.mp3")
+      all_uploaded=false
     fi
   done
+
+  # Only create post if ALL WPM variants are confirmed uploaded
+  if $all_uploaded; then
+    create_post "$date" "$message"
+  else
+    echo "  Skipping post creation for $date (some uploads failed)"
+  fi
 
   # Cleanup temp files
   rm -f "$date"-intro.mp3 "$date"-outro.mp3 "$date"-message-*.mp3 "$date".*.WPM.mp3 2>/dev/null || true
@@ -187,7 +248,7 @@ main() {
 
     if ! all_episodes_exist "$date"; then
       process_date "$date"
-      ((processed++))
+      ((processed++)) || true
     fi
   done
 
@@ -205,6 +266,29 @@ main() {
         trigger_derive "$item"
       done
     fi
+  fi
+
+  # Report failures
+  if [[ ${#FAILED_UPLOADS[@]} -gt 0 ]]; then
+    echo ""
+    echo "========================================="
+    echo "UPLOAD FAILURES (${#FAILED_UPLOADS[@]}):"
+    printf '  - %s\n' "${FAILED_UPLOADS[@]}"
+    echo "========================================="
+
+    # Write to GitHub Actions job summary if available
+    if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+      {
+        echo "## :warning: Upload Failures"
+        echo ""
+        printf -- '- \`%s\`\n' "${FAILED_UPLOADS[@]}"
+        echo ""
+        echo "These episodes were not uploaded. Posts were **not** created for dates with failures."
+        echo "The workflow will retry on the next run (within the ${MAX_BACKFILL_DAYS}-day backfill window)."
+      } >> "$GITHUB_STEP_SUMMARY"
+    fi
+
+    exit 1
   fi
 }
 

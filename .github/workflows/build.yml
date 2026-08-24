@@ -1,9 +1,12 @@
 name: build
 
+# NOTE: GitHub disables scheduled workflows after 60 days of repo inactivity.
+# Re-enable via Actions tab or: gh workflow enable build
+
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/25 5 * * *'
+    - cron: '25 5 * * *'
   push:
     branches:
       - main
@@ -50,6 +53,8 @@ jobs:
           rm -rf ebook2cw
 
       - name: Press all episodes
+        id: press
+        continue-on-error: true
         env:
           S3_ACCESS: ${{ secrets.S3_ACCESS }}
           S3_SECRET: ${{ secrets.S3_SECRET }}
@@ -102,3 +107,10 @@ jobs:
             git commit -m "Deploy Jekyll site"
             git push origin gh-pages
           fi
+
+      - name: Report upload failures
+        if: steps.press.outcome == 'failure'
+        run: |
+          echo "::error::Some episode uploads failed. Check the job summary for details."
+          echo "The workflow will retry failed uploads on the next scheduled run."
+          exit 1
