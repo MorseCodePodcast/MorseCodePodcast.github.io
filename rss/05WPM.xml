@@ -8,9 +8,9 @@
 		<language></language>
 		<managingEditor> ()</managingEditor>
 		<webMaster> ()</webMaster>
-		<copyright>2021-Tue, 15 Sep 2026 09:58:57 +0000 Morse Code Podcast</copyright>
-		<pubDate>Tue, 15 Sep 2026 09:58:57 +0000</pubDate>
-		<lastBuildDate>Tue, 15 Sep 2026 09:58:57 +0000</lastBuildDate>
+		<copyright>2021-Wed, 16 Sep 2026 09:49:58 +0000 Morse Code Podcast</copyright>
+		<pubDate>Wed, 16 Sep 2026 09:49:58 +0000</pubDate>
+		<lastBuildDate>Wed, 16 Sep 2026 09:49:58 +0000</lastBuildDate>
 		<image>
 			<link>https://morsecodepodcast.github.io</link>
 			<url>https://morsecodepodcast.github.io/images/itunes.png</url>
@@ -33,6 +33,24 @@
 			<itunes:category text="Morse Code" />
 		</itunes:category>
 		<itunes:explicit>no</itunes:explicit>
+		
+			<item>
+				<title>2026-09-16</title>
+				<link>https://morsecodepodcast.github.io/2026/09/16/Post.html</link>
+				<pubDate>Wed, 16 Sep 2026 00:00:00 +0000</pubDate>
+				<description>&lt;p&gt;Q:How do you stop an elephant from charging?A:Take away his credit cards.&lt;/p&gt;
+</description>
+				<guid isPermaLink="true">https://morsecodepodcast.github.io/2026/09/16/Post.html</guid>
+				<enclosure url="https://archive.org/download/mcp.05.WPM/2026-09-16.05.WPM.mp3" length="11444" type="audio/mp3"/>
+				<itunes:author></itunes:author>
+				<itunes:subtitle>Morse Code Podcast: 2026-09-16</itunes:subtitle>
+				<itunes:summary>Q:How do you stop an elephant from charging?A:Take away his credit cards.</itunes:summary>
+				<itunes:duration>01:00</itunes:duration>
+				<itunes:keywords></itunes:keywords>
+				<itunes:image href="https://morsecodepodcast.github.io/images/itunes.png" />
+				<itunes:explicit>no</itunes:explicit>
+				<itunes:block>no</itunes:block>
+			</item>
 		
 			<item>
 				<title>2026-09-15</title>
