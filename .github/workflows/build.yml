@@ -120,7 +120,12 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Generous on purpose: this job spends its time waiting for a runner and for
+    # the Pages API, not burning CPU. A tight cap turns a slow runner assignment
+    # into a hard failure -- which is exactly what happened during the GitHub
+    # Actions incident of 2026-10-05 (degraded runner assignment), where the job
+    # was cancelled having executed zero steps.
+    timeout-minutes: 30
     permissions:
       pages: write
       id-token: write
