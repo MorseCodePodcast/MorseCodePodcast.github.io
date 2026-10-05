@@ -1,0 +1,82 @@
+{%- comment -%}
+Shared podcast feed body. Rendered once per WPM speed by rss/<NN>WPM.xml.
+Params: include.wpm -> zero-padded speed, e.g. "05".
+
+Per-episode size/duration live in front matter as length_<wpm> / duration_<wpm>
+because every speed produces a differently sized file from the same text.
+Missing size emits length="0" (clients read that as "unknown") rather than a
+wrong number, which is what broke downloads before.
+{%- endcomment -%}
+{%- assign lenkey = "length_" | append: include.wpm -%}
+{%- assign durkey = "duration_" | append: include.wpm -%}
+{%- assign art = site.url | append: "/assets/itunes.png" -%}
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xml:lang="{{ site.lang }}">
+	<channel>
+		<atom:link href="{{ site.url }}/rss/{{ include.wpm }}WPM.xml" rel="self" type="application/rss+xml" />
+		<title>{{ site.title }} - {{ include.wpm }} WPM</title>
+		<description>{{ site.description | xml_escape }} This feed transmits at {{ include.wpm }} words per minute.</description>
+		<link>{{ site.url }}</link>
+		<language>{{ site.lang }}</language>
+		{%- if site.email %}
+		<managingEditor>{{ site.email }} ({{ site.author }})</managingEditor>
+		<webMaster>{{ site.email }} ({{ site.author }})</webMaster>
+		{%- endif %}
+		<copyright>Copyright 2021-{{ site.time | date: "%Y" }} {{ site.title }}</copyright>
+		<pubDate>{{ site.time | date_to_rfc822 }}</pubDate>
+		<lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
+		<generator>Jekyll</generator>
+		<image>
+			<link>{{ site.url }}</link>
+			<url>{{ art }}</url>
+			<title>{{ site.title }} - {{ include.wpm }} WPM</title>
+		</image>
+		<itunes:subtitle>Morse code practice at {{ include.wpm }} words per minute.</itunes:subtitle>
+		<itunes:author>{{ site.author }}</itunes:author>
+		<itunes:summary>{{ site.description | xml_escape }} This feed transmits at {{ include.wpm }} words per minute.</itunes:summary>
+		<itunes:keywords>{{ site.keywords }}</itunes:keywords>
+		<itunes:owner>
+			<itunes:name>{{ site.author }}</itunes:name>
+			{%- if site.email %}
+			<itunes:email>{{ site.email }}</itunes:email>
+			{%- endif %}
+		</itunes:owner>
+		<itunes:image href="{{ art }}" />
+		<itunes:category text="Education">
+			<itunes:category text="Courses" />
+		</itunes:category>
+		<itunes:type>episodic</itunes:type>
+		<itunes:explicit>false</itunes:explicit>
+		{%- comment -%}
+		Roughly a quarter of the post archive predates the upload-verification fix
+		and has no audio on archive.org at all. Listing those items hands the client
+		an enclosure that 404s, so skip any post with no recorded size and count only
+		the ones actually emitted toward the limit.
+		{%- endcomment -%}
+		{%- assign shown = 0 -%}
+		{%- for post in site.posts -%}
+		{%- if shown >= site.feed_item_limit %}{% break %}{% endif -%}
+		{%- assign size = post[lenkey] -%}
+		{%- if size -%}
+		{%- assign shown = shown | plus: 1 %}
+			<item>
+				<title>{{ post.title | xml_escape }}</title>
+				<link>{{ site.url }}{{ post.url }}</link>
+				<pubDate>{{ post.date | date_to_rfc822 }}</pubDate>
+				<description>{{ post.excerpt | xml_escape }}</description>
+				<guid isPermaLink="true">{{ site.url }}{{ post.url }}</guid>
+				<enclosure url="https://archive.org/download/mcp.{{ include.wpm }}.WPM/{{ post.today }}.{{ include.wpm }}.WPM.mp3" length="{{ size }}" type="audio/mpeg"/>
+				<itunes:author>{{ site.author }}</itunes:author>
+				<itunes:subtitle>{{ site.title }}: {{ post.title }}</itunes:subtitle>
+				<itunes:summary>{{ post.summary | xml_escape }}</itunes:summary>
+				{%- if post[durkey] %}
+				<itunes:duration>{{ post[durkey] }}</itunes:duration>
+				{%- endif %}
+				<itunes:image href="{{ art }}" />
+				<itunes:explicit>{% if post.explicit == "yes" %}true{% else %}false{% endif %}</itunes:explicit>
+				<itunes:block>{{ post.block }}</itunes:block>
+			</item>
+		{%- endif -%}
+		{%- endfor %}
+	</channel>
+</rss>

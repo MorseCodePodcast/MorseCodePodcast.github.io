@@ -92,15 +92,27 @@ verify_upload() {
   return 1
 }
 
+# Fresh show-note text. Newlines/tabs become spaces rather than being deleted,
+# otherwise adjacent sentences weld together. Double quotes are dropped because
+# the message is embedded in a double-quoted YAML scalar.
+new_message() {
+  fortune -s \
+    | tr '\n\b\t' '   ' \
+    | tr -cd '[:print:]' \
+    | tr '"' ' ' \
+    | tr -s ' ' \
+    | sed 's/^ *//; s/ *$//'
+}
+
 # Get or create message for a date
 get_message() {
   local date=$1
   local post_file="_posts/$date-Post.md"
 
   if [[ -f "$post_file" ]]; then
-    grep -oP "^message:\s+\K.*" "$post_file" | tr -d '"' || fortune -s | tr -d '\n\b' | tr -cd '[:print:] ' | tr -s '\t' ' ' | tr -s '"' ' ' | tr -s '  '
+    grep -oP "^message:\s+\K.*" "$post_file" | tr -d '"' || new_message
   else
-    fortune -s | tr -d '\n\b' | tr -cd '[:print:] ' | tr -s '\t' ' ' | tr -s '"' ' ' | tr -s '  '
+    new_message
   fi
 }
 
@@ -122,8 +134,6 @@ file_itunes:
 excerpt:
 summary: "$message"
 message: "$message"
-duration: "01:00"
-length: "11444"
 explicit: "no"
 block: "no"
 ---

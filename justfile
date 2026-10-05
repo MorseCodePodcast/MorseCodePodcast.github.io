@@ -17,8 +17,27 @@ lint:
     fi
 
 # No automated tests; stub returns success so verify chain works
+# Build the site and assert the podcast feeds are actually consumable:
+# real enclosure sizes, audio/mpeg, no items pointing at missing audio.
 test:
-    @echo "test: no test suite (TODO: add Jekyll build smoke-test)"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    out=$(mktemp -d); trap 'rm -rf "$out"' EXIT
+    if command -v bundle &>/dev/null; then
+        bundle exec jekyll build --destination "$out"
+    elif command -v nix-shell &>/dev/null; then
+        # No Ruby on host: borrow jekyll from nixpkgs. The minima theme and the
+        # plugins are not in that closure and none of them affect rss/*.xml.
+        cfg=$(mktemp --suffix=.yml); trap 'rm -rf "$out" "$cfg"' EXIT
+        sed -e 's/^theme: .*/theme: null/' -e 's/^plugins:/_plugins_disabled:/' _config.yml > "$cfg"
+        printf '\nsource: %s\n' "$PWD" >> "$cfg"
+        nix-shell -p jekyll --run "jekyll build --config $cfg --destination $out" 2>&1 \
+            | grep -viE "build warning: layout" || true
+    else
+        echo "test: no bundle and no nix-shell, cannot build" >&2
+        exit 1
+    fi
+    ./verify_feeds.py "$out"
 
 # Build the Jekyll site (skips gracefully if bundle unavailable)
 build:

@@ -27,6 +27,17 @@ url: "https://morsecodepodcast.github.io" # the base hostname & protocol for you
 # twitter_username:
 github_username:  MorseCodePodcast
 
+# Feed metadata. `lang` and `author` render into every rss/*.xml; empty values
+# previously produced <language></language> and "<managingEditor> ()" which
+# podcast clients reject.
+author: "Morse Code Podcast"
+lang: "en-us"
+keywords: "morse code, cw, ham radio, amateur radio, learning, practice"
+
+# Items per feed. The archive is 2000+ episodes; shipping all of them made each
+# feed ~2 MB and it is re-fetched on every poll, times six feeds.
+feed_item_limit: 100
+
 # Build settings
 theme: minima
 
