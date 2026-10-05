@@ -19,9 +19,15 @@ concurrency:
   group: build
   cancel-in-progress: false
 
+# Pinned rather than resolved from HEAD on every run: upstream's last commit is
+# from 2023-08-21, so this was a network call that returned the same answer each
+# time while leaving the cache key able to shift without warning.
+env:
+  EBOOK2CW_REF: b4b1fa2debee89c08c5f67040e887e86a5e61f15
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     permissions:
       contents: write
@@ -29,23 +35,17 @@ jobs:
       press_outcome: ${{ steps.press.outcome }}
     steps:
       # Shallow: nothing here reads history, and the archive is 2000+ posts deep.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Set Date Env
         run: echo "TODAY=$(date +%F)" >> $GITHUB_ENV
 
-      - name: Get ebook2cw latest commit hash
-        id: ebook2cw-version
-        run: |
-          HASH=$(git ls-remote https://github.com/dj1yfk/ebook2cw.git HEAD | cut -f1)
-          echo "hash=$HASH" >> $GITHUB_OUTPUT
-
       - name: Cache ebook2cw binary
         id: cache-ebook2cw
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: /usr/local/bin/ebook2cw
-          key: ebook2cw-${{ runner.os }}-${{ steps.ebook2cw-version.outputs.hash }}
+          key: ebook2cw-${{ runner.os }}-${{ env.EBOOK2CW_REF }}
 
       # Runtime packages are always needed. The toolchain and -dev headers are
       # only needed to compile ebook2cw, which is cached, so installing them on
@@ -65,7 +65,8 @@ jobs:
       - name: Build ebook2cw
         if: steps.cache-ebook2cw.outputs.cache-hit != 'true'
         run: |
-          git clone --depth 1 https://github.com/dj1yfk/ebook2cw.git
+          git clone https://github.com/dj1yfk/ebook2cw.git
+          git -C ebook2cw checkout --quiet "$EBOOK2CW_REF"
           # Fix german translation error
           sed -i.bak 's/\(install .*-m 0644 po\/de.mo\)/#\1/' ebook2cw/Makefile
           sudo make --directory=ebook2cw/
@@ -87,7 +88,7 @@ jobs:
         run: ./backfill_metadata.py
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
           ruby-version: '3.4'
           bundler-cache: true
@@ -115,11 +116,11 @@ jobs:
           fi
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Generous on purpose: this job spends its time waiting for a runner and for
     # the Pages API, not burning CPU. A tight cap turns a slow runner assignment
     # into a hard failure -- which is exactly what happened during the GitHub
@@ -134,7 +135,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5
 
   # Deliberately a separate job, NOT a step of `build`: a failing step there
   # would make `deploy` skip via `needs:`, so one flaky archive.org upload
@@ -142,7 +143,7 @@ jobs:
   report:
     needs: [build, deploy]
     if: always() && needs.build.outputs.press_outcome == 'failure'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Report upload failures
