@@ -4,7 +4,6 @@ _site
 .jekyll-metadata
 *.mp3
 vendor
-Gemfile.lock
 
 # Claude Code agent worktrees
 .claude/worktrees/

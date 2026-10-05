@@ -11,20 +11,25 @@ on:
     branches:
       - main
 
-# A scheduled run and a push run both commit to main and deploy to gh-pages.
+permissions: {}
+
+# A scheduled run and a push run both commit to main and deploy the site.
 # Overlapping them races the push and loses episodes.
 concurrency:
   group: build
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     permissions:
       contents: write
+    outputs:
+      press_outcome: ${{ steps.press.outcome }}
     steps:
       # Shallow: nothing here reads history, and the archive is 2000+ posts deep.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set Date Env
         run: echo "TODAY=$(date +%F)" >> $GITHUB_ENV
@@ -37,7 +42,7 @@ jobs:
 
       - name: Cache ebook2cw binary
         id: cache-ebook2cw
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: /usr/local/bin/ebook2cw
           key: ebook2cw-${{ runner.os }}-${{ steps.ebook2cw-version.outputs.hash }}
@@ -84,29 +89,22 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
+          ruby-version: '3.4'
           bundler-cache: true
-
-      - name: Cache Jekyll build
-        uses: actions/cache@v4
-        with:
-          path: .jekyll-cache
-          key: jekyll-${{ runner.os }}-${{ hashFiles('_config.yml', '_includes/**', '_layouts/**') }}
-          restore-keys: jekyll-${{ runner.os }}-
 
       - name: Build Jekyll site
         run: bundle exec jekyll build
 
-      # Fails the run before deploying a feed clients would reject.
+      # Gate: fails the run before the artifact is uploaded, so a feed clients
+      # would reject never reaches the deploy job.
       - name: Verify feeds
         run: ./verify_feeds.py _site --sample 3
 
-      # --global so it applies to the gh-pages checkout too, which is a
-      # separate repo and does not inherit this one's local config.
+      # Local config, not --global: only this checkout commits anything.
       - name: Configure git
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Commit and push new posts
         run: |
@@ -116,31 +114,33 @@ jobs:
             git push origin main
           fi
 
-      # Separate checkout rather than swapping branches in place: the old
-      # approach ran `git clean -fdx` + `rm -rf *` over the working tree and
-      # relied on a full clone. Jekyll ignores dot-directories, so this one is
-      # not picked up by the build.
-      - name: Checkout gh-pages
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: .gh-pages
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
 
-      - name: Deploy to gh-pages
-        working-directory: .gh-pages
-        run: |
-          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-          cp -r ../_site/. .
-          # Skip Jekyll processing on the Pages side; the site is already built.
-          touch .nojekyll
-          git add -A
-          if ! git diff --staged --quiet; then
-            git commit -m "Deploy Jekyll site"
-            git push origin gh-pages
-          fi
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
 
+  # Deliberately a separate job, NOT a step of `build`: a failing step there
+  # would make `deploy` skip via `needs:`, so one flaky archive.org upload
+  # would stop the site updating. This reports after the deploy has happened.
+  report:
+    needs: [build, deploy]
+    if: always() && needs.build.outputs.press_outcome == 'failure'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
       - name: Report upload failures
-        if: steps.press.outcome == 'failure'
         run: |
           echo "::error::Some episode uploads failed. Check the job summary for details."
           echo "The workflow will retry failed uploads on the next scheduled run."

@@ -41,6 +41,11 @@ feed_item_limit: 100
 # Build settings
 theme: minima
 
+# jekyll 4.4 uses dart-sass, whose default output is not minified
+# (9816 bytes vs 8790 before).
+sass:
+  style: compressed
+
 collections:
   rss:
   blog:
@@ -67,6 +72,16 @@ exclude:
   - LICENSE
   - README.md
   - .github/
+  - justfile
+  - verify_feeds.py
+  - backfill_metadata.py
+  - make_artwork.sh
+  - AGENTS.md
+  - CLAUDE.md
+  - todo.md
+  - openspec/
+  - _drafts/
+  - .a5c/
 #   - node_modules/
 #   - vendor/bundle/
 #   - vendor/cache/
