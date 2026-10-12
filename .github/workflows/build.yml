@@ -50,11 +50,17 @@ jobs:
       # Runtime packages are always needed. The toolchain and -dev headers are
       # only needed to compile ebook2cw, which is cached, so installing them on
       # every run cost ~a minute for nothing.
+      # fortunes-min is listed explicitly because it is only a *Recommends* of
+      # fortune-mod: --no-install-recommends installs the binary with no data,
+      # so `fortune` exits 1 with "No fortunes found" and every episode fails.
       - name: Install runtime dependencies
         run: |
           sudo apt-get update
           sudo apt-get install --assume-yes --no-install-recommends \
-            fortune espeak sox libsox-fmt-all libmp3lame0 libvorbisfile3
+            fortune fortunes-min espeak sox libsox-fmt-all libmp3lame0 libvorbisfile3
+          # Gate the data, not just the binary: a silent regression here broke
+          # six consecutive days of builds before anyone looked at the log.
+          fortune -s > /dev/null
 
       - name: Install build dependencies
         if: steps.cache-ebook2cw.outputs.cache-hit != 'true'
@@ -146,8 +152,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - name: Report upload failures
+      # Not "upload failures": this fires on ANY non-zero exit from the press
+      # step, and saying "upload" sent six days of debugging in the wrong
+      # direction when the real cause was a missing apt package.
+      - name: Report press failures
         run: |
-          echo "::error::Some episode uploads failed. Check the job summary for details."
-          echo "The workflow will retry failed uploads on the next scheduled run."
+          echo "::error::The episode press step failed. See the 'Press all episodes' step log in the build job."
+          echo "Failing dates still inside the backfill window are retried on the next scheduled run."
           exit 1

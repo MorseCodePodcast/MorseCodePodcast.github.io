@@ -257,7 +257,10 @@ main() {
     date=$(date -d "$i days ago" +%F 2>/dev/null || date -v-"$i"d +%F)
 
     if ! all_episodes_exist "$date"; then
-      process_date "$date"
+      # Isolated on purpose: set -e used to abort the whole loop on the oldest
+      # failing date, so one broken day blocked the six newer ones from ever
+      # being generated (fortune data outage, 2026-10-06 .. 2026-10-12).
+      process_date "$date" || FAILED_UPLOADS+=("$date (processing error, see log above)")
       ((processed++)) || true
     fi
   done
@@ -282,18 +285,18 @@ main() {
   if [[ ${#FAILED_UPLOADS[@]} -gt 0 ]]; then
     echo ""
     echo "========================================="
-    echo "UPLOAD FAILURES (${#FAILED_UPLOADS[@]}):"
+    echo "FAILURES (${#FAILED_UPLOADS[@]}):"
     printf '  - %s\n' "${FAILED_UPLOADS[@]}"
     echo "========================================="
 
     # Write to GitHub Actions job summary if available
     if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
       {
-        echo "## :warning: Upload Failures"
+        echo "## :warning: Episode Failures"
         echo ""
         printf -- '- \`%s\`\n' "${FAILED_UPLOADS[@]}"
         echo ""
-        echo "These episodes were not uploaded. Posts were **not** created for dates with failures."
+        echo "These episodes were not published. Posts were **not** created for dates with failures."
         echo "The workflow will retry on the next run (within the ${MAX_BACKFILL_DAYS}-day backfill window)."
       } >> "$GITHUB_STEP_SUMMARY"
     fi
