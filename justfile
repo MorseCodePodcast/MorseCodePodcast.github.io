@@ -16,12 +16,13 @@ lint:
         echo "lint: bundle not found, skipping Gemfile check"
     fi
 
-# No automated tests; stub returns success so verify chain works
-# Build the site and assert the podcast feeds are actually consumable:
-# real enclosure sizes, audio/mpeg, no items pointing at missing audio.
+# Two gates: the episode_press decision logic (offline, stubbed) and the built
+# site's feeds -- real enclosure sizes, audio/mpeg, no items pointing at
+# missing audio.
 test:
     #!/usr/bin/env bash
     set -euo pipefail
+    ./test_episode_press.sh
     out=$(mktemp -d); trap 'rm -rf "$out"' EXIT
     if command -v bundle &>/dev/null; then
         bundle exec jekyll build --destination "$out"

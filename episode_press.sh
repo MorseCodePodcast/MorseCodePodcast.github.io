@@ -73,25 +73,6 @@ upload_with_retry() {
   return 1
 }
 
-# Verify upload exists on Archive.org (with propagation delay)
-verify_upload() {
-  local url=$1
-  local max_attempts=3
-  local attempt=1
-  local delay=20
-
-  while (( attempt <= max_attempts )); do
-    sleep "$delay"
-    if curl --head --fail --silent --output /dev/null --location-trusted "$url"; then
-      return 0
-    fi
-    echo "  Verification attempt $attempt/$max_attempts failed, retrying in ${delay}s..."
-    delay=$((delay * 2))
-    ((attempt++))
-  done
-  return 1
-}
-
 # Fresh show-note text. Newlines/tabs become spaces rather than being deleted,
 # otherwise adjacent sentences weld together. Double quotes are dropped because
 # the message is embedded in a double-quoted YAML scalar.
@@ -159,32 +140,47 @@ process_date() {
     fi
   done
 
-  # If all episodes exist, nothing to do
+  # All audio present. Reached only when the post is missing, so create it:
+  # otherwise a date whose uploads landed but whose post was skipped stays
+  # invisible in the feed forever.
   if [[ ${#wpms_to_process[@]} -eq 0 ]]; then
-    echo "All episodes exist for $date"
+    echo "All episodes exist for $date, creating missing post"
+    create_post "$date" "$(get_message "$date")"
     return 0
   fi
 
   echo "Processing ${#wpms_to_process[@]} missing WPM variants for $date"
 
-  # Get the message (from existing post or generate new one)
+  # Get the message (from existing post or generate new one).
+  # Checked explicitly: process_date runs on the left of a `||`, which disables
+  # errexit inside it, so a failing `fortune` would otherwise sail through and
+  # publish an episode of silence with an empty show note.
   local message
-  message=$(get_message "$date")
+  if ! message=$(get_message "$date") || [[ -z $message ]]; then
+    echo "  FAILED: could not get a show-note message for $date"
+    return 1
+  fi
 
   # Get human-readable date for intro
   local readable_date
   readable_date=$(date -d "$date" +'%A %B %e %Y' 2>/dev/null || date -j -f "%Y-%m-%d" "$date" +'%A %B %e %Y')
 
   # Generate intro if needed
-  if [[ ! -f "$date-intro.mp3" ]]; then
+  if [[ ! -s "$date-intro.mp3" ]]; then
     espeak "This is the Morse Code Podcast for $readable_date" --stdout | \
-      sox - -t mp3 -r 44100 "$date"-intro.mp3
+      sox - -t mp3 -r 44100 "$date"-intro.mp3 || {
+        echo "  FAILED: could not render intro for $date"
+        return 1
+      }
   fi
 
   # Generate outro if needed
-  if [[ ! -f "$date-outro.mp3" ]]; then
+  if [[ ! -s "$date-outro.mp3" ]]; then
     espeak "This concludes our transmission" --stdout | \
-      sox - -t mp3 -r 44100 "$date"-outro.mp3
+      sox - -t mp3 -r 44100 "$date"-outro.mp3 || {
+        echo "  FAILED: could not render outro for $date"
+        return 1
+      }
   fi
 
   # Upload each missing WPM variant, track success
@@ -193,29 +189,36 @@ process_date() {
   for wpm in "${wpms_to_process[@]}"; do
     echo "  Generating $wpm WPM for $date..."
 
-    # Generate Morse code audio
-    echo "$message" | ebook2cw -c "" -w 30 -e "$wpm" -s 44100 -o "$date"-message-"$wpm"
+    # Generate Morse code audio, then combine intro + message + outro.
+    # Both are guarded, and the result is required to be non-empty, so a
+    # toolchain failure cannot put a 0-byte "episode" on archive.org.
+    if ! echo "$message" | ebook2cw -c "" -w 30 -e "$wpm" -s 44100 -o "$date"-message-"$wpm" \
+      || ! sox --combine concatenate "$date"-intro.mp3 "$date"-message-"$wpm".mp3 \
+           "$date"-outro.mp3 "$date"."$wpm".WPM.mp3 \
+      || [[ ! -s "$date.$wpm.WPM.mp3" ]]; then
+      echo "  FAILED: could not render $wpm WPM audio for $date"
+      FAILED_UPLOADS+=("$date.$wpm.WPM.mp3 (render error)")
+      all_uploaded=false
+      continue
+    fi
 
-    # Combine intro + message + outro
-    sox --combine concatenate "$date"-intro.mp3 "$date"-message-"$wpm".mp3 "$date"-outro.mp3 "$date"."$wpm".WPM.mp3
-
-    # Upload to Archive.org with retry
+    # A 200 from archive.org's S3 endpoint is the authoritative ack. There is
+    # deliberately no read-back check here: /download/ only reflects an upload
+    # after the item's derive task runs, and derive is triggered once at the
+    # end of main -- so an inline poll was asking about a refresh that had not
+    # been requested yet. It cost ~140s per variant and still reported healthy
+    # uploads as failed, which suppressed the post; the next run then saw the
+    # audio, called the date complete, and never created the post, leaving
+    # episodes on archive.org that nothing in the feed pointed at. Existence is
+    # re-checked on the next run instead, after derive has had time to land.
     echo "  Uploading $wpm WPM to Archive.org..."
     local upload_url="https://s3.us.archive.org/mcp.$wpm.WPM/$date.$wpm.WPM.mp3"
-    local verify_url="https://archive.org/download/mcp.$wpm.WPM/$date.$wpm.WPM.mp3"
 
     if upload_with_retry "$date.$wpm.WPM.mp3" "$upload_url" "$wpm"; then
-      echo "  Upload succeeded, verifying..."
-      if verify_upload "$verify_url"; then
-        echo "  Verified: $date.$wpm.WPM.mp3"
-        # Track this item for derive task (avoid duplicates)
-        if [[ ! " ${ITEMS_TO_DERIVE[*]:-} " =~ " mcp.$wpm.WPM " ]]; then
-          ITEMS_TO_DERIVE+=("mcp.$wpm.WPM")
-        fi
-      else
-        echo "  WARNING: $date.$wpm.WPM.mp3 uploaded but verification failed"
-        FAILED_UPLOADS+=("$date.$wpm.WPM.mp3")
-        all_uploaded=false
+      echo "  Uploaded: $date.$wpm.WPM.mp3"
+      # Track this item for derive task (avoid duplicates)
+      if [[ ! " ${ITEMS_TO_DERIVE[*]:-} " =~ " mcp.$wpm.WPM " ]]; then
+        ITEMS_TO_DERIVE+=("mcp.$wpm.WPM")
       fi
     else
       echo "  FAILED: $date.$wpm.WPM.mp3 upload failed after retries"
@@ -224,7 +227,8 @@ process_date() {
     fi
   done
 
-  # Only create post if ALL WPM variants are confirmed uploaded
+  # Only create post if ALL WPM variants uploaded: a partial date would
+  # publish a feed entry whose enclosures 404 for some WPM variants.
   if $all_uploaded; then
     create_post "$date" "$message"
   else
@@ -256,7 +260,7 @@ main() {
     # GNU date vs BSD date compatibility
     date=$(date -d "$i days ago" +%F 2>/dev/null || date -v-"$i"d +%F)
 
-    if ! all_episodes_exist "$date"; then
+    if ! all_episodes_exist "$date" || [[ ! -f "_posts/$date-Post.md" ]]; then
       # Isolated on purpose: set -e used to abort the whole loop on the oldest
       # failing date, so one broken day blocked the six newer ones from ever
       # being generated (fortune data outage, 2026-10-06 .. 2026-10-12).

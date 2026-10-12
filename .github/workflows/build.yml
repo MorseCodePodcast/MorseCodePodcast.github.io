@@ -28,7 +28,10 @@ env:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    # A single day is ~6 minutes. The cap only bites on a deep backfill: seven
+    # missed days is 42 generate+upload cycles, which blew a 45m cap outright
+    # and lost the whole run's work rather than part of it.
+    timeout-minutes: 90
     permissions:
       contents: write
     outputs:
@@ -39,6 +42,11 @@ jobs:
 
       - name: Set Date Env
         run: echo "TODAY=$(date +%F)" >> $GITHUB_ENV
+
+      # Fully stubbed, so it runs before the toolchain exists and fails in
+      # seconds rather than 40 minutes into a backfill.
+      - name: Test episode press logic
+        run: ./test_episode_press.sh
 
       - name: Cache ebook2cw binary
         id: cache-ebook2cw
