@@ -13,8 +13,6 @@ tags: []
 
 - [ ] 475 dates x 6 speeds have no audio on archive.org (Oct 2024 - Jan 2026) (MorseCodePodcast_github_io-e9n) <!-- tw:c1c3e475-141e-4b1c-a7db-a02321b43615 -->
 - [ ] Feed GUIDs are identical across all six WPM feeds (MorseCodePodcast_github_io-f9t) <!-- tw:04252f7e-9018-4fe3-bd0f-d26e36925ef6 -->
-- [ ] Daily run repairs the N newest missing dates instead of a bulk backfill (MorseCodePodcast_github_io-11d) <!-- tw:c82fb19c-663c-4efc-923c-c171fc2cd865 -->
-- [ ] verify_feeds.py: check every enclosure against archive.org metadata, not 3 random HEADs (MorseCodePodcast_github_io-mfk) <!-- tw:0f4eb36a-00c9-4004-85dd-c24edce1cd1b -->
 
 ## Blocked <!-- the-desk:filter project:MorseCodePodcast.github.io status:pending +BLOCKED -->
 
@@ -26,3 +24,5 @@ tags: []
 - [x] episode_press.sh: one /metadata/ fetch per item instead of per-date HEAD requests (MorseCodePodcast_github_io-2qm) <!-- tw:3e93c693-592c-4c62-ae35-641e9844d4e1 -->
 - [x] Chunked manual-dispatch workflow to press the archive.org gap (MorseCodePodcast_github_io-nco) <!-- tw:361ca85b-b0f1-4c01-ac11-347e5bc555c7 -->
 - [x] episode_press.sh: accept an explicit date list for historical backfill (MorseCodePodcast_github_io-72b) <!-- tw:19c7ca0d-4f8c-4166-a326-405fa8ea69d8 -->
+- [x] Daily run repairs the N newest missing dates instead of a bulk backfill (MorseCodePodcast_github_io-11d) <!-- tw:c82fb19c-663c-4efc-923c-c171fc2cd865 -->
+- [x] verify_feeds.py: check every enclosure against archive.org metadata, not 3 random HEADs (MorseCodePodcast_github_io-mfk) <!-- tw:0f4eb36a-00c9-4004-85dd-c24edce1cd1b -->
