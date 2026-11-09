@@ -45,8 +45,10 @@ jobs:
 
       # Fully stubbed, so it runs before the toolchain exists and fails in
       # seconds rather than 40 minutes into a backfill.
-      - name: Test episode press logic
-        run: ./test_episode_press.sh
+      - name: Test episode press and metadata logic
+        run: |
+          ./test_episode_press.sh
+          ./test_backfill_metadata.py
 
       - name: Cache ebook2cw binary
         id: cache-ebook2cw
@@ -65,7 +67,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --assume-yes --no-install-recommends \
-            fortune fortunes-min espeak sox libsox-fmt-all libmp3lame0 libvorbisfile3
+            fortune fortunes-min espeak sox libsox-fmt-all libmp3lame0 libvorbisfile3 \
+            jq
           # Gate the data, not just the binary: a silent regression here broke
           # six consecutive days of builds before anyone looked at the log.
           fortune -s > /dev/null
@@ -93,6 +96,13 @@ jobs:
         env:
           S3_ACCESS: ${{ secrets.S3_ACCESS }}
           S3_SECRET: ${{ secrets.S3_SECRET }}
+          # After the 7-day window, repair this many dates that have a post but
+          # no audio, newest first -- the enclosures existing subscribers keep
+          # retrying. ~67s per date, so 3 adds ~3 minutes to a run and works the
+          # 475-date gap off over months instead of one enormous push. 0 is off;
+          # anything above 20, or not a number, warns loudly and disables the
+          # repair -- an optional knob must never stop today's episode.
+          REPAIR_PER_RUN: 3
         run: ./episode_press.sh 05 10 15 20 25 30
 
       # Writes the true size/duration of every episode into post front matter.
@@ -113,7 +123,7 @@ jobs:
       # Gate: fails the run before the artifact is uploaded, so a feed clients
       # would reject never reaches the deploy job.
       - name: Verify feeds
-        run: ./verify_feeds.py _site --sample 3
+        run: ./verify_feeds.py _site
 
       # Local config, not --global: only this checkout commits anything.
       - name: Configure git

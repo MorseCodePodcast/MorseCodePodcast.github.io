@@ -16,13 +16,15 @@ lint:
         echo "lint: bundle not found, skipping Gemfile check"
     fi
 
-# Two gates: the episode_press decision logic (offline, stubbed) and the built
+# Three gates: the episode_press decision logic (offline, stubbed), the
+# backfill's archive.org outage tolerance (offline), and the built
 # site's feeds -- real enclosure sizes, audio/mpeg, no items pointing at
 # missing audio.
 test:
     #!/usr/bin/env bash
     set -euo pipefail
     ./test_episode_press.sh
+    ./test_backfill_metadata.py
     out=$(mktemp -d); trap 'rm -rf "$out"' EXIT
     if command -v bundle &>/dev/null; then
         bundle exec jekyll build --destination "$out"

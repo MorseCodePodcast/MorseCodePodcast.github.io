@@ -5,11 +5,17 @@ Guards the specific failures that stopped AntennaPod downloading: a bogus
 enclosure MIME type, a declared size that did not match the file, and items
 pointing at audio that was never uploaded.
 
-Usage: ./verify_feeds.py <site-dir> [--sample N]
+Checks EVERY enclosure in every feed, not a sample: one archive.org metadata
+document per speed -- the same six documents backfill_metadata.py reads --
+lists the name and size of every file in the item, so full coverage costs six
+requests instead of one per enclosure. A sampled gate let a feed with a single
+bad item pass most of the time, which defeats the point of a gate.
+
+Usage: ./verify_feeds.py <site-dir>
 """
 from __future__ import annotations
 
-import random
+import json
 import sys
 import time
 import urllib.error
@@ -28,32 +34,38 @@ def check(cond: bool, msg: str) -> None:
         failures.append(msg)
 
 
-def head(url: str, attempts: int = 3) -> tuple[int, int]:
-    """HEAD a URL, retrying server errors.
+def metadata(wpm: str, attempts: int = 3) -> tuple[dict[str, str] | None, str]:
+    """Return ({filename: size_bytes}, "") for one item, else (None, reason).
 
-    Archive.org returns a sporadic 500 on healthy files, so a single bad
-    response must not fail the build; a 404 is ours and is never retried.
+    None means archive.org gave us no usable answer: unreachable, timing out,
+    5xx, unparseable, or the bare `{}` it serves for an item it cannot read.
+    None of that is a defect in our feed, so the caller warns rather than
+    failing -- reading an empty document as "every file is missing" would turn
+    one archive.org blip into six failed feeds and a blocked deploy.
     """
-    status = 0
+    url = f"https://archive.org/metadata/mcp.{wpm}.WPM"
+    reason = ""
     for i in range(attempts):
-        req = urllib.request.Request(url, method="HEAD")
         try:
-            with urllib.request.urlopen(req, timeout=60) as r:
-                return r.status, int(r.headers.get("Content-Length") or 0)
+            with urllib.request.urlopen(url, timeout=120) as r:
+                files = json.load(r).get("files")
+            if files:
+                # Mirror backfill_metadata.py: an entry with no size is not a
+                # file we can validate a declared length against.
+                return {f["name"]: f["size"] for f in files
+                        if f.get("name") and f.get("size")}, ""
+            reason = "no file list in metadata document"
         except urllib.error.HTTPError as e:
-            status = e.code
-            if e.code < 500:
-                return e.code, 0
-        except OSError:
-            status = 0
+            reason = f"HTTP {e.code}"
+        except (OSError, ValueError) as e:
+            reason = f"{type(e).__name__}: {e}"
         if i + 1 < attempts:
             time.sleep(2 * (i + 1))
-    return status, 0
+    return None, reason
 
 
 def main() -> int:
     site = Path(sys.argv[1])
-    sample_n = int(sys.argv[sys.argv.index("--sample") + 1]) if "--sample" in sys.argv else 5
 
     check((site / "assets/itunes.png").exists(), "assets/itunes.png missing from build")
 
@@ -92,20 +104,29 @@ def main() -> int:
         sizes = {e.get("length") for e in encs}
         check(len(sizes) > 1, f"{wpm}: every item declares the same length {sizes}")
 
-        # Spot-check that the declared size is the real one.
-        for e in random.sample(encs, min(sample_n, len(encs))):
-            url, declared = e.get("url"), int(e.get("length"))
-            status, actual = head(url)
-            if status == 200:
-                check(actual == declared,
-                      f"{wpm}: {url} declared {declared} but server says {actual}")
-            elif status >= 500 or status == 0:
-                # Archive.org being unavailable is not a defect in our feed.
-                warnings.append(f"{wpm}: {url} -> HTTP {status or 'no response'} (upstream)")
-            else:
-                failures.append(f"{wpm}: {url} -> HTTP {status}")
+        # Every declared size against the size archive.org records, in one request.
+        files, why = metadata(wpm)
+        # Counted, not inferred from `files is None`: the printed figure is what
+        # a human reads to decide the feeds are healthy, and it used to say
+        # "5/5 enclosures verified" in the same run that reported a missing file.
+        verified = 0
+        if files is None:
+            warnings.append(f"{wpm}: archive.org metadata unavailable ({why}); "
+                            f"{len(encs)} enclosures unverified (upstream)")
+        else:
+            for e in encs:
+                url, declared = e.get("url", ""), int(e.get("length") or 0)
+                name = url.rsplit("/", 1)[-1]
+                actual = files.get(name)
+                if actual is None:
+                    failures.append(f"{wpm}: {url} -> no such file in archive.org item")
+                elif int(actual) != declared:
+                    failures.append(f"{wpm}: {url} declared {declared} "
+                                    f"but archive.org records {actual}")
+                else:
+                    verified += 1
         print(f"{wpm}WPM: {len(items)} items, {path.stat().st_size // 1024} KB, "
-              f"{sample_n} enclosures spot-checked")
+              f"{verified}/{len(encs)} enclosures verified")
 
     if warnings:
         print(f"\nwarnings ({len(warnings)}), not fatal:")
